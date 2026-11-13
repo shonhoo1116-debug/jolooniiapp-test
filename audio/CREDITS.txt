@@ -1,0 +1,13 @@
+Дууны эх сурвалж — бүгд CC0 (Public Domain Dedication), OpenGameArt.org. Зохиогчийн эрх шаардахгүй; бүртгэлийн зорилгоор жагсаав.
+
+engine.wav   — "racing car engine sound loops" (loop_2), domasx2 — https://opengameart.org/content/racing-car-engine-sound-loops
+horn.mp3     — "Car Sound Effects Pack" (Car_Horn), GGBotNet — https://opengameart.org/content/car-sound-effects-pack-low-quality
+crash.mp3    — "crash / collision", qubodup — https://opengameart.org/content/crash-collision
+siren.mp3    — "Sirens and alarm noise", aquinn — https://opengameart.org/content/sirens-and-alarm-noise
+click.mp3, ding.mp3, chimes.mp3, negative.mp3 — "UI sound effects, button clicks, user feedback, notifications", Robin Lamb — https://opengameart.org/content/ui-sound-effects-button-clicks-user-feedback-notifications
+music1.mp3   — "A Chill Fever (loopable)", Pro Sensory — https://opengameart.org/content/a-chill-fever-loopable
+music2.mp3   — "Chill Lofi inspired", omfgdude — https://opengameart.org/content/chill-lofi-inspired
+rain.mp3     — "amb_rain_loop_1", Kresiek The Furry — https://opengameart.org/content/amb-rain-loop-1
+traffic.mp3  — "High traffic road sounds", IgnasD — https://opengameart.org/content/high-traffic-road-sounds
+
+Боловсруулалт: ffmpeg-ээр моно болгож, багасгаж, зарим дууны хэсгийг таслав. www/js/audio-data.js нь эдгээрийг base64-ээр агуулна (file:// дээр ч ажиллахын тулд): node tools/build_audio.mjs

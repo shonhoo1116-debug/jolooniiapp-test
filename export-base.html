@@ -1,0 +1,10 @@
+<!doctype html><meta charset="utf-8"><style>html,body{margin:0;overflow:hidden;background:#000}svg{display:block}</style>
+<body><div id="o"></div><script id="meta" type="application/json"></script>
+<script src="js/tests-art3d.js"></script>
+<script>
+const q = new URLSearchParams(location.search), id = q.get('id'), i = +(q.get('i') || 0);
+P3.cfg.on = true; P3.cfg.W = 1536; P3.cfg.H = 1024; P3.cfg.shift = +(q.get('s') || 0); P3.cfg.out = []; P3.cfg.meta = [];
+TEST_ART3D[id]();
+document.getElementById('o').innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="1536" height="1024" viewBox="0 0 1536 1024">${P3.cfg.out[i]}</svg>`;
+document.getElementById('meta').textContent = JSON.stringify({ id, panels: P3.cfg.out.length, meta: P3.cfg.meta });
+</script></body>

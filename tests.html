@@ -1,0 +1,1070 @@
+<!doctype html>
+<html lang="mn">
+<head>
+<meta charset="utf-8">
+<script src="js/license.js"></script>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0e1830">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Отгон жолоо">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<script>if ('serviceWorker' in navigator && location.protocol === 'https:' && location.hostname !== 'localhost') window.addEventListener('load', function () { navigator.serviceWorker.register('sw.js').then(function () { return navigator.serviceWorker.ready; }).then(function (r) { if (r.active) r.active.postMessage('warm'); }).catch(function () {}); });</script>
+<script>
+(function () {
+  var KEY = 'zam-theme', d = document.documentElement;
+  try { d.setAttribute('data-theme', localStorage.getItem(KEY) === 'dark' ? 'dark' : 'light'); } catch (e) { d.setAttribute('data-theme', 'light'); }
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest && e.target.closest('.thm'); if (!b) return;
+    var next = d.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    d.classList.add('thm-anim'); d.setAttribute('data-theme', next);
+    try { localStorage.setItem(KEY, next); } catch (e2) {}
+    setTimeout(function () { d.classList.remove('thm-anim'); }, 320);
+  });
+})();
+</script>
+<title>Жолооны шалгалтын тест</title>
+<style>
+  /* эхний зураглалаас өмнөх фон: native splash-тай ижил өнгө (хар/бараан дэлгэц харагдахгүй) */
+  html { background:#E4EBFA; } html[data-theme="dark"] { background:#0B1020; }
+  html[data-theme="light"] body:not(:has(.phone)) { background:#E4EBFA; } html[data-theme="dark"] body:not(:has(.phone)) { background:#0B1020; }
+</style>
+<style>
+  :root { --bg:#0b1428; --card:#15223c; --line:#243659; --ink:#f4f1e8; --dim:#9fb0cc; --acc:#ffd23f; --ok:#27c46b; --bad:#ff5a5a; }
+  * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  body { margin:0; background:#060c1a; color:var(--ink); font-family:system-ui,"Segoe UI",Roboto,sans-serif; }
+  .phone { max-width:480px; min-height:100vh; min-height:100dvh; margin:0 auto; background:var(--bg); display:flex; flex-direction:column; position:relative; }
+  .top { display:flex; align-items:center; gap:10px; padding:calc(12px + env(safe-area-inset-top)) 14px 8px; }
+  .top .back { width:44px; height:44px; border-radius:12px; border:1px solid var(--line); background:var(--card); color:var(--acc); font-size:22px; display:grid; place-items:center; text-decoration:none; flex:none; }
+  .top h1 { flex:1; margin:0; text-align:center; font-size:16px; color:var(--acc); line-height:1.2; }
+  .top .cnt { border:1px solid var(--line); background:var(--card); border-radius:12px; padding:8px 11px; font-size:13px; color:var(--ink); flex:none; }
+  .prog { margin:4px 18px 12px; height:7px; background:var(--card); border-radius:99px; overflow:hidden; } .prog i { display:block; height:100%; background:var(--acc); border-radius:99px; transition:width .25s; }
+  .body { flex:1; overflow-y:auto; padding:0 14px 14px; }
+  .art { border-radius:16px; overflow:hidden; border:1px solid var(--line); background:#0d1730; margin-bottom:12px; } .art svg, .art canvas { display:block; width:100%; height:auto; }
+  .q { background:var(--card); border:1px solid var(--line); border-radius:14px; padding:13px 15px; font-size:16px; font-weight:700; line-height:1.35; margin-bottom:10px; }
+  .opt { display:flex; align-items:center; gap:12px; width:100%; text-align:left; background:var(--card); color:var(--ink); border:1.5px solid var(--line); border-radius:13px; padding:9px 13px; margin-bottom:8px; font:inherit; font-size:15px; cursor:pointer; min-height:48px; }
+  .opt .n { width:32px; height:32px; flex:none; border-radius:50%; background:#22345a; display:grid; place-items:center; font-weight:800; font-size:14px; }
+  .opt .t { flex:1; line-height:1.3; } .opt .m { font-size:20px; flex:none; }
+  .opt:hover:not([disabled]) { border-color:var(--acc); }
+  .opt.ok { border-color:var(--ok); background:#0f2f27; color:#bff5d6; } .opt.ok .n { background:var(--ok); color:#06210f; }
+  .opt.bad { border-color:var(--bad); background:#341820; color:#ffc9c9; } .opt.bad .n { background:var(--bad); color:#fff; }
+  .opt[disabled] { cursor:default; }
+  .why { background:#101d36; border-left:4px solid var(--acc); border-radius:10px; padding:10px 13px; margin:4px 0 8px; color:var(--dim); font-size:14px; line-height:1.45; } .why b { color:var(--acc); display:block; margin-bottom:3px; font-size:15px; }
+  .bar { position:sticky; bottom:0; display:flex; align-items:center; justify-content:space-between; gap:10px; padding:12px 14px calc(12px + env(safe-area-inset-bottom)); background:var(--bg); border-top:1px solid var(--line); }
+  .bar .bm { width:50px; height:50px; border-radius:14px; border:1px solid var(--line); background:var(--card); color:var(--ink); font-size:24px; cursor:pointer; flex:none; } .bar .bm.on { color:var(--acc); border-color:var(--acc); }
+  .bar .pc { color:var(--dim); font-size:15px; flex:1; text-align:center; }
+  .bar .nx { height:50px; min-width:150px; border:0; border-radius:16px; background:var(--acc); color:#1b2233; font:inherit; font-weight:800; font-size:16px; cursor:pointer; padding:0 20px; } .bar .nx:disabled { opacity:.4; cursor:default; } .bar .pv { height:50px; width:50px; border-radius:14px; border:1px solid var(--line); background:var(--card); color:var(--ink); font-size:22px; cursor:pointer; }
+  /* шалгах хуудас */
+  .rv { max-width:1100px; margin:0 auto; padding:16px; }
+  .rv h1 { color:var(--acc); font-size:22px; margin:6px 0 4px; } .rv a { color:var(--acc); }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:14px; padding:14px; margin:14px 0; }
+  .card h2 { margin:0 0 8px; font-size:17px; color:var(--acc); }
+  .cols { display:grid; grid-template-columns:1fr 1fr; gap:12px; } @media (max-width:820px) { .cols { grid-template-columns:1fr; } }
+  .cap { font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:var(--dim); margin:0 0 5px; }
+  .crop { position:relative; aspect-ratio:900/385; overflow:hidden; background:#000; border:1px solid var(--line); border-radius:8px; } .crop img { position:absolute; left:0; top:-53.77%; width:100%; }
+  .rq { font-weight:700; margin:12px 0 4px; font-size:17px; } .rv ol { margin:0; padding-left:24px; color:var(--dim); } .rv li.ok { color:#7ff0ac; font-weight:700; }
+  .rv .why { font-size:14px; } .note { font-size:13px; color:#ffcf8a; background:#3a2a12; border-radius:8px; padding:8px 10px; margin-top:10px; }
+
+  /* ---- өнгөлөг орчин үеийн хэв маяг ---- */
+  :root { --ch:#ffd23f; }
+  body { background:#050a1a; }
+  .phone { background:radial-gradient(120% 60% at 50% -8%, #1d2f66 0%, #0b1330 52%, #070d22 100%); }
+  .top h1 { color:#fff; font-size:16px; letter-spacing:.2px; }
+  .top .back, .top .cnt { background:rgba(255,255,255,.06); border-color:rgba(255,255,255,.12); backdrop-filter:blur(6px); }
+  .top .back { color:var(--ch); }
+  .prog { background:rgba(255,255,255,.1); } .prog i { background:linear-gradient(90deg, var(--ch), #fff7); }
+  .art { border:0; box-shadow:0 10px 28px rgba(0,0,0,.45), 0 0 0 1px rgba(255,255,255,.08); }
+  .q { background:linear-gradient(135deg, rgba(255,255,255,.09), rgba(255,255,255,.03)); border:1px solid rgba(255,255,255,.12); border-left:4px solid var(--ch); box-shadow:0 6px 18px rgba(0,0,0,.25); }
+  .opt { background:rgba(255,255,255,.05); border:1.5px solid rgba(255,255,255,.1); box-shadow:0 3px 10px rgba(0,0,0,.2); transition:transform .12s, border-color .12s, background .12s; }
+  .opt:active:not([disabled]) { transform:scale(.985); }
+  .opt .n { background:linear-gradient(135deg, var(--ch), #ffffff55); color:#0b1330; }
+  .opt:hover:not([disabled]) { border-color:var(--ch); background:rgba(255,255,255,.09); }
+  .opt.ok { background:linear-gradient(135deg, #0f3b2c, #0c2a24); border-color:#2fe08a; } .opt.ok .n { background:#2fe08a; color:#04210f; }
+  .opt.bad { background:linear-gradient(135deg, #43182a, #2c1220); border-color:#ff6b7d; } .opt.bad .n { background:#ff6b7d; color:#fff; }
+  .why { background:linear-gradient(135deg, rgba(255,210,63,.1), rgba(255,255,255,.03)); border-left-color:var(--ch); }
+  .why b { color:var(--ch); }
+  .bar { background:rgba(8,14,32,.92); backdrop-filter:blur(10px); border-top:1px solid rgba(255,255,255,.1); }
+  .bar .bm, .bar .pv { background:rgba(255,255,255,.07); border-color:rgba(255,255,255,.14); } .bar .bm.on { color:var(--ch); border-color:var(--ch); }
+  .bar .nx { background:linear-gradient(135deg, #ffe066, var(--ch)); box-shadow:0 6px 16px rgba(0,0,0,.3); }
+  /* нүүр хуудас */
+  .hero { margin:calc(10px + env(safe-area-inset-top)) 14px 14px; padding:16px 14px 14px; border-radius:22px; background:linear-gradient(135deg, #2b3f8f, #4b2a8f 60%, #7a2d8f); box-shadow:0 14px 34px rgba(60,40,160,.45); text-align:center; position:relative; overflow:hidden; }
+  .hero::after { content:''; position:absolute; right:-40px; top:-50px; width:160px; height:160px; border-radius:50%; background:radial-gradient(circle, rgba(255,255,255,.22), transparent 70%); }
+  .hero img { width:100%; max-width:300px; border-radius:12px; display:block; margin:0 auto 10px; box-shadow:0 6px 18px rgba(0,0,0,.35); }
+  .hero h2 { margin:0; font-size:20px; color:#fff; } .hero p { margin:4px 0 0; color:#dcd6ff; font-size:13px; }
+  .tiles { display:grid; grid-template-columns:1fr 1fr; gap:12px; padding:0 14px; margin-bottom:6px; }
+  .tile { border-radius:20px; padding:16px 14px; text-decoration:none; color:#fff; display:flex; flex-direction:column; gap:4px; min-height:136px; justify-content:flex-end; position:relative; overflow:hidden; box-shadow:0 10px 24px rgba(0,0,0,.35); }
+  .tile .ic { position:absolute; top:12px; left:14px; font-size:36px; opacity:.95; filter:drop-shadow(0 3px 6px rgba(0,0,0,.3)); }
+  .tile b { font-size:17px; } .tile small { font-size:12px; opacity:.9; }
+  .tile.cat { min-height:128px; } .tile.catB { grid-column:1/-1; background:linear-gradient(135deg, #7c4dff, #3d5afe); } .tile.catC { grid-column:1/-1; background:linear-gradient(135deg, #2f7cf6, #19b5a5); } .tile.catD { background:linear-gradient(135deg, #f59e0b, #ef6c00); } .tile.catE { background:linear-gradient(135deg, #e91e63, #9c27b0); }
+  .tile.cat.soon { grid-column:1/-1; background:rgba(255,255,255,.07); border:1px dashed rgba(255,255,255,.22); box-shadow:none; color:#9fb0d8; } .tile.cat.soon .ic { opacity:.7; }
+  .tile.t1 { background:linear-gradient(135deg, #7c4dff, #3d5afe); } .tile.t2 { background:linear-gradient(135deg, #19b5a5, #2f7cf6); }
+  .sec { margin:14px 18px 8px; font-size:13px; font-weight:800; letter-spacing:.8px; text-transform:uppercase; color:var(--dim); }
+  .ch { display:flex; align-items:center; gap:12px; margin:0 14px 10px; padding:11px 12px; border-radius:18px; text-decoration:none; color:var(--ink); background:linear-gradient(135deg, rgba(255,255,255,.08), rgba(255,255,255,.03)); border:1px solid rgba(255,255,255,.1); box-shadow:0 4px 14px rgba(0,0,0,.22); }
+  .ch .no { width:42px; height:42px; border-radius:14px; flex:none; display:grid; place-items:center; font-weight:900; font-size:18px; color:#0b1330; background:linear-gradient(135deg, var(--c), #ffffffaa); box-shadow:0 4px 12px color-mix(in srgb, var(--c) 45%, transparent); }
+  .ch .tx { flex:1; font-size:14.5px; font-weight:700; line-height:1.3; } .ch .tx small { display:block; margin-top:3px; font-size:12px; font-weight:500; color:var(--dim); }
+  .ch .go { color:var(--c); font-size:22px; flex:none; }
+
+  /* бүх асуулт нэг дор гүйлгэгдэнэ */
+  .hd { position:sticky; top:0; z-index:6; background:rgba(8,14,34,.94); backdrop-filter:blur(10px); border-bottom:1px solid rgba(255,255,255,.08); padding-bottom:2px; }
+  .hd .prog { margin:2px 18px 8px; }
+  .feed { padding-top:12px; padding-bottom:40px; }
+  .qc { margin-bottom:26px; padding-bottom:24px; border-bottom:1px dashed rgba(255,255,255,.14); }
+  .qc:last-of-type { border-bottom:0; }
+  .qn { display:flex; align-items:center; justify-content:space-between; margin:0 2px 8px; }
+  .qn span { min-width:34px; height:28px; padding:0 10px; border-radius:99px; display:inline-grid; place-items:center; font-weight:800; font-size:13px; color:#0b1330; background:linear-gradient(135deg, var(--ch), #ffffffaa); }
+  .qn .bm { width:38px; height:34px; border-radius:10px; border:1px solid rgba(255,255,255,.14); background:rgba(255,255,255,.06); color:var(--ink); font-size:18px; cursor:pointer; } .qn .bm.on { color:var(--ch); border-color:var(--ch); }
+  .artbox { aspect-ratio:1930/820; }
+  .endmark { text-align:center; color:var(--dim); font-size:13px; padding:8px 0 4px; }
+
+  /* хажуу тийш шудрах (swipe) */
+  .phone.fixed { height:100vh; height:100dvh; min-height:0; overflow:hidden; }
+  html:has(.phone.fixed), body:has(.phone.fixed) { overflow:hidden; height:100%; }
+  .track { flex:1; min-height:0; display:flex; overflow-x:auto; overflow-y:hidden; scroll-snap-type:x mandatory; overscroll-behavior-x:contain; scrollbar-width:none; }
+  .track::-webkit-scrollbar { display:none; }
+  .track .qc { scrollbar-width:none; } .track .qc::-webkit-scrollbar { display:none; }
+  .phone.fixed .bar .pc { display:none; } .phone.fixed .bar .nx { flex:1; }
+  .track .qc { flex:0 0 100%; width:100%; scroll-snap-align:start; scroll-snap-stop:always; overflow-y:auto; margin:0; padding:10px 14px calc(30px + env(safe-area-inset-bottom)); border:0; }
+
+  /* асуулт, сонголт дэвсгэрээсээ тод ялгарна */
+  .q { background:linear-gradient(135deg, color-mix(in srgb, var(--ch) 58%, #1a2a66), color-mix(in srgb, var(--ch) 22%, #14214f)); border:1px solid color-mix(in srgb, var(--ch) 70%, #fff); border-left-width:5px; color:#fff; box-shadow:0 8px 20px rgba(0,0,0,.35); }
+  .opt { background:#1d2f66; border:1.5px solid #3a4f94; color:#fff; box-shadow:0 3px 8px rgba(0,0,0,.3); }
+  .opt:hover:not([disabled]) { background:#25397a; border-color:var(--ch); }
+  .opt.ok { background:#0f4a35; border-color:#2fe08a; } .opt.bad { background:#5a1d33; border-color:#ff6b7d; }
+  .why { background:#1a2a5c; border:1px solid #3a4f94; border-left:4px solid var(--ch); color:#d8e2ff; }
+
+  /* тод ялгарах хувилбар: асуултын хуудас цэнхэр дэвсгэртэй, асуулт цагаан */
+  .track { background:linear-gradient(165deg, #3552c4 0%, #25379a 55%, #1b2878 100%); }
+  .track .qc { color:#fff; }
+  .track .q { background:#fff; color:#14214f; border:0; border-left:6px solid var(--ch); box-shadow:0 8px 20px rgba(5,10,40,.35); }
+  .track .opt { background:#0f1d4d; border:1.5px solid #7f95e6; color:#fff; box-shadow:0 4px 10px rgba(5,10,40,.35); }
+  .track .opt:hover:not([disabled]) { background:#16286a; border-color:#fff; }
+  .track .opt.ok { background:#0e5a3d; border-color:#4cf0a0; } .track .opt.bad { background:#6a1e38; border-color:#ff8a9c; }
+  .track .why { background:#eef2ff; color:#1a2a5c; border:0; border-left:5px solid var(--ch); } .track .why b { color:#14214f; }
+  .track .art { box-shadow:0 8px 20px rgba(5,10,40,.4); }
+  .track .qn .bm { background:rgba(255,255,255,.18); border-color:rgba(255,255,255,.4); }
+
+  .track .q { font-size:18px; line-height:1.4; padding:15px 16px; }
+  .track .opt { font-size:16px; }
+
+  .tile.t0 { grid-column:1/-1; min-height:112px; background:linear-gradient(135deg, #ec407a, #8e24aa); }
+  .tile.t0 .ic { left:auto; right:16px; top:14px; font-size:44px; }
+  .track .opt.sel { background:#2f4ec4; border-color:#fff; } .track .opt.sel .n { background:#fff; color:#1b2878; }
+  .phone.exam .bar .pc { display:block; } .skip { font-style:normal; font-size:12px; font-weight:800; color:#ffd7de; background:rgba(255,80,110,.35); border-radius:99px; padding:3px 10px; }
+  .cnt.warn { background:#b3263f; border-color:#ff8a9c; color:#fff; }
+  .score { margin:18px 14px 16px; padding:22px 16px; text-align:center; border-radius:24px; background:linear-gradient(135deg, #3552c4, #6a3fc8); box-shadow:0 12px 30px rgba(40,50,160,.45); }
+  .score .big { font-size:64px; font-weight:900; line-height:1; } .score .big small { font-size:26px; opacity:.8; font-weight:700; }
+  .score.pass { background:linear-gradient(135deg, #1b8f5a, #27b36f); box-shadow:0 12px 30px rgba(20,140,90,.45); } .score.fail { background:linear-gradient(135deg, #b3283e, #d8445a); box-shadow:0 12px 30px rgba(190,40,70,.45); }
+  .score .verdict { font-size:26px; font-weight:900; letter-spacing:1px; margin-bottom:10px; } .score .vnote { margin-top:6px; font-size:13px; font-weight:700; }
+  .score .pct { margin-top:8px; font-size:16px; font-weight:700; } .score .meta { margin-top:8px; font-size:13px; color:#d6dcff; }
+  .wide { display:flex; align-items:center; justify-content:center; width:calc(100% - 28px); margin:10px 14px 0; text-align:center; padding:0; }
+  .nx.wide { height:54px; line-height:54px; border:0; border-radius:16px; background:linear-gradient(135deg, #ffe066, #ffd23f); color:#1b2233; font:inherit; font-weight:800; font-size:17px; cursor:pointer; }
+  .pv2.wide { height:50px; line-height:48px; border-radius:16px; border:1px solid rgba(255,255,255,.22); background:rgba(255,255,255,.07); color:#fff; font:inherit; font-weight:700; font-size:15px; cursor:pointer; text-decoration:none; }
+
+  .ch.soon { opacity:.5; filter:saturate(.3); } .ch.soon .no { background:rgba(255,255,255,.18); box-shadow:none; color:#cfd8f7; } .ch.soon .go { font-size:16px; color:inherit; }
+
+  /* нэг дэлгэцэнд багтаах: хураангуй хэв — сонголтууд зураасаар тусгаарлагдана */
+  .track .qc { padding:6px 14px calc(14px + env(safe-area-inset-bottom)); }
+  .qn { margin:0 0 6px; } .qn span { height:24px; min-width:30px; font-size:12px; } .qn .bm { width:34px; height:28px; font-size:16px; }
+  .track .art { margin-bottom:8px; border-radius:12px; max-height:27vh; display:flex; justify-content:center; background:#0d1730; }
+  .track .art svg, .track .art canvas { width:auto; max-width:100%; max-height:27vh; height:auto; }
+  .track .q { font-size:17px; line-height:1.32; padding:11px 13px; margin-bottom:6px; border-radius:12px; }
+  .track .opt { background:transparent; border:0; border-bottom:1px solid rgba(255,255,255,.28); border-radius:0; box-shadow:none; margin:0; padding:9px 4px; min-height:0; gap:11px; font-size:15.5px; }
+  .track .opt:last-of-type { border-bottom:0; }
+  .track .opt .n { width:26px; height:26px; font-size:12.5px; } .track .opt .m { font-size:18px; }
+  .track .opt:hover:not([disabled]) { background:rgba(255,255,255,.08); }
+  .track .opt.sel { background:rgba(255,255,255,.16); border-bottom-color:rgba(255,255,255,.28); }
+  .track .opt.ok { background:rgba(60,230,150,.2); border-bottom-color:rgba(60,230,150,.55); } .track .opt.bad { background:rgba(255,100,130,.22); border-bottom-color:rgba(255,110,140,.55); }
+  .track .why { margin:8px 0 0; padding:8px 11px; font-size:13px; line-height:1.38; border-radius:10px; } .track .why b { display:inline; margin:0 4px 0 0; font-size:13px; }
+
+  .qc.tight .q { font-size:15.5px; padding:8px 11px; } .qc.tight .opt { font-size:14.5px; padding:6px 4px; } .qc.tight .why { font-size:12px; padding:6px 9px; margin-top:5px; } .qc.tight .opt .n { width:23px; height:23px; font-size:11.5px; }
+  .qc.tighter .q { font-size:14.5px; } .qc.tighter .opt { font-size:13.5px; padding:4px 3px; } .qc.tighter .why { font-size:11.5px; line-height:1.28; }
+
+
+  /* ---- «Liquid glass» загвар (туршилт): нүүр, ангилал/бүлгийн жагсаалт, шалгалтын дүн. Асуултын дэлгэц хөндөгдөөгүй. Буцаах: .phone.gl класс авч хаях эсвэл tests.html.bak-glass ---- */
+  body:has(.phone.gl) { background:#d9e1f2; }
+  .phone.gl { --ink:#1a2547; --dim:#5a6a90; color:var(--ink);
+    background:radial-gradient(60% 40% at 12% 6%, #bcd3ff 0%, transparent 70%), radial-gradient(55% 38% at 92% 14%, #e2c9ff 0%, transparent 70%), radial-gradient(60% 40% at 80% 60%, #ffd9e8 0%, transparent 72%), radial-gradient(70% 45% at 8% 82%, #c4f0e4 0%, transparent 72%), linear-gradient(180deg, #e9effb, #dfe7f7); }
+  .gl .hero, .gl .tile, .gl .ch, .gl .top .back, .gl .top .cnt, .gl .score, .gl .pv2.wide {
+    background:linear-gradient(145deg, rgba(255,255,255,.62), rgba(255,255,255,.22)); border:1px solid rgba(255,255,255,.85);
+    backdrop-filter:blur(22px) saturate(1.7); -webkit-backdrop-filter:blur(22px) saturate(1.7);
+    box-shadow:0 10px 30px rgba(60,80,150,.16), inset 0 1px 0 rgba(255,255,255,.95), inset 0 -1px 0 rgba(255,255,255,.35); color:var(--ink); }
+  .gl .top h1 { color:#1a2547; } .gl .top .back { color:#3d5afe; }
+  .gl .hero { border-radius:28px; } .gl .hero::after { background:radial-gradient(circle, rgba(255,255,255,.7), transparent 70%); } .gl .hero img { box-shadow:0 6px 18px rgba(60,80,150,.22); }
+  .gl .tile { border-radius:28px; color:var(--ink); } .gl .tile small { color:var(--dim); opacity:1; } .gl .tile b { color:#1a2547; }
+  .gl .tile::before { content:''; position:absolute; right:-30px; top:-40px; width:150px; height:150px; border-radius:50%; background:radial-gradient(circle, var(--tint, #9db4ff) 0%, transparent 68%); opacity:.75; pointer-events:none; }
+  .gl .tile.catB, .gl .tile.t1 { --tint:#8fa8ff; } .gl .tile.catC { --tint:#7fe0cf; } .gl .tile.t2 { --tint:#7fe0cf; } .gl .tile.t0 { --tint:#ff9ac4; }
+  .gl .tile.t0, .gl .tile.catB, .gl .tile.catC, .gl .tile.t1, .gl .tile.t2 { background:linear-gradient(145deg, rgba(255,255,255,.62), rgba(255,255,255,.22)); }
+  .gl .tile.cat.soon { background:rgba(255,255,255,.28); border:1px dashed rgba(90,106,144,.45); box-shadow:none; color:var(--dim); } .gl .tile.cat.soon b { color:var(--dim); } .gl .tile.cat.soon::before { display:none; }
+  /* олон мөр + backdrop-filter = гүйлгэхэд бичиг алга болдог (зураглалын алдаа) → жагсаалтын мөрөнд бүдгэрүүлэлтгүй, давхар цагаан хагас тунгалаг */
+  .gl .ch { backdrop-filter:none; -webkit-backdrop-filter:none; background:linear-gradient(145deg, rgba(255,255,255,.78), rgba(255,255,255,.5)); box-shadow:0 6px 18px rgba(60,80,150,.14), inset 0 1px 0 #fff; }
+  .gl .ch { border-radius:22px; } .gl .ch .tx { color:#1a2547; } .gl .ch .tx small { color:var(--dim); }
+  .gl .ch .no { color:#fff; background:linear-gradient(135deg, var(--c), color-mix(in srgb, var(--c) 55%, #fff)); box-shadow:0 6px 14px color-mix(in srgb, var(--c) 40%, transparent), inset 0 1px 0 rgba(255,255,255,.6); }
+  .gl .ch.soon { opacity:.6; filter:saturate(.5); } .gl .ch.soon .no { background:rgba(120,135,170,.35); }
+  .gl .score { border-radius:30px; color:var(--ink); } .gl .score .meta { color:var(--dim); } .gl .score .big small { opacity:.6; }
+  .gl .score.pass { background:linear-gradient(145deg, rgba(120,235,175,.55), rgba(255,255,255,.28)); box-shadow:0 12px 32px rgba(30,160,100,.22), inset 0 1px 0 rgba(255,255,255,.95); } .gl .score.pass .verdict { color:#0c7a47; }
+  .gl .score.fail { background:linear-gradient(145deg, rgba(255,130,150,.5), rgba(255,255,255,.28)); box-shadow:0 12px 32px rgba(200,50,80,.2), inset 0 1px 0 rgba(255,255,255,.95); } .gl .score.fail .verdict { color:#c2263f; }
+  .gl .nx.wide { border-radius:22px; color:#1a2547; box-shadow:0 8px 22px rgba(255,190,40,.35), inset 0 1px 0 rgba(255,255,255,.7); }
+  .gl .pv2.wide { border-radius:22px; color:#1a2547; }
+
+  /* ---- Цэс дээрх чөлөөтэй жолоодох машин. Буцаах: tests.html.bak-car (машингүй) ---- */
+  .fc { position:fixed; left:0; top:0; width:40px; height:87px; z-index:30; touch-action:none; cursor:grab; user-select:none; -webkit-user-select:none; filter:drop-shadow(0 7px 6px rgba(30,40,90,.4)); will-change:transform; }
+  .fc.grab { cursor:grabbing; filter:drop-shadow(0 14px 10px rgba(30,40,90,.45)); } .fc img { display:block; width:100%; height:100%; pointer-events:none; -webkit-user-drag:none; }
+  .fc.bounce img { animation:fcbounce .35s; } @keyframes fcbounce { 40% { transform:scale(1.2,.9); } 70% { transform:scale(.95,1.06); } }
+  .fc-puff { position:fixed; z-index:29; width:10px; height:10px; margin:-5px 0 0 -5px; border-radius:50%; background:rgba(255,255,255,.95); box-shadow:0 0 8px rgba(120,140,200,.4); animation:fcpuff .6s ease-out forwards; pointer-events:none; }
+  @keyframes fcpuff { to { transform:translate(var(--dx,0), 0) scale(2.6); opacity:0; } }
+  .fc-bubble.sm { animation-duration:2.6s; font-size:11.5px; font-weight:700; line-height:1.25; padding:5px 10px; white-space:normal; max-width:230px; width:max-content; text-align:center; border-radius:14px; }
+  .fc-bubble { position:fixed; z-index:31; padding:6px 12px; border-radius:16px; background:#fff; color:#1a2547; font-weight:800; font-size:13px; white-space:nowrap; box-shadow:0 6px 16px rgba(40,60,130,.3); animation:fcpop 1.5s ease forwards; pointer-events:none; }
+  @keyframes fcpop { 0% { transform:scale(.3) translateY(8px); opacity:0; } 15% { transform:scale(1.08); opacity:1; } 25% { transform:scale(1); } 80% { opacity:1; } 100% { opacity:0; transform:translateY(-10px); } }
+  .fc-colors { display:flex; align-items:center; justify-content:center; gap:7px; margin:10px 14px 14px; font-size:12px; color:#5a6a90; }
+  .fc-colors { flex-wrap:wrap; } .fc-colors span { flex-basis:100%; text-align:center; } .fc-colors i { width:21px; height:39px; padding:2px; border-radius:9px; cursor:pointer; transition:transform .12s; background:rgba(255,255,255,.45); border:1px solid rgba(255,255,255,.9); } .fc-colors i img { display:block; width:100%; height:100%; object-fit:contain; } .fc-colors i.on { transform:translateY(-3px) scale(1.12); background:#fff; box-shadow:0 0 0 2px #3d5afe, 0 6px 12px rgba(40,60,130,.3); }
+
+  .fc-sign { position:fixed; z-index:25; width:66px; height:66px; display:grid; place-items:center; border-radius:50%; pointer-events:none;
+    background:radial-gradient(circle at 30% 26%, rgba(255,255,255,.98) 0 6%, rgba(255,255,255,.35) 13%, transparent 30%), radial-gradient(circle at 72% 78%, rgba(255,255,255,.55) 0 5%, transparent 16%), radial-gradient(circle at 50% 50%, rgba(255,255,255,.18) 52%, rgba(150,200,255,.34) 74%, rgba(255,160,225,.42) 90%, rgba(255,255,255,.7) 100%);
+    border:1.5px solid rgba(255,255,255,.85); box-shadow:inset 0 0 16px rgba(150,200,255,.55), inset -7px -9px 16px rgba(255,160,225,.28), inset 7px 8px 14px rgba(255,255,255,.35), 0 8px 18px rgba(60,80,150,.22);
+    animation:fcsin .5s cubic-bezier(.3,1.7,.5,1) both, fcfloat 2.8s ease-in-out .5s infinite; }
+  .fc-sign canvas { width:42px; height:42px; display:block; filter:drop-shadow(0 2px 3px rgba(30,40,90,.25)); }
+  .fc-sign.rare { border-color:#ffe27a; box-shadow:inset 0 0 18px rgba(255,210,80,.8), inset -7px -9px 16px rgba(255,170,60,.4), 0 0 0 2px rgba(255,201,51,.9), 0 0 24px rgba(255,190,40,.95), 0 8px 18px rgba(60,80,150,.22); }
+  .fc-sign.out { animation:fcout .65s ease forwards; } .fc-sign.got { animation:fcgot .22s ease-out forwards; } .fc-sign.got canvas { animation:fcgotc .3s ease-out forwards; }
+  @keyframes fcsin { 0% { transform:scale(0) rotate(-40deg); opacity:0; } 100% { transform:scale(1) rotate(0); opacity:1; } }
+  @keyframes fcfloat { 0%,100% { transform:translateY(0) scale(1,1); } 25% { transform:translateY(-4px) scale(1.03,.97); } 50% { transform:translateY(-7px) scale(.97,1.03); } 75% { transform:translateY(-3px) scale(1.02,.98); } }
+  @keyframes fcout { 0% { opacity:1; } 100% { opacity:0; transform:scale(.4); } } @keyframes fcgot { 0% { transform:scale(1); opacity:1; } 35% { transform:scale(1.22,1.12); opacity:1; } 100% { transform:scale(1.5); opacity:0; } } @keyframes fcgotc { 0% { transform:scale(1); opacity:1; } 100% { transform:scale(1.35) translateY(-6px); opacity:0; } }
+  .fc-ring { position:fixed; z-index:27; width:20px; height:20px; margin:-10px 0 0 -10px; border-radius:50%; border:3px solid rgba(255,255,255,.95); box-shadow:0 0 10px rgba(150,200,255,.9), inset 0 0 8px rgba(255,160,225,.6); pointer-events:none; animation:fcring .45s ease-out forwards; } .fc-ring.gold { border-color:#ffe27a; box-shadow:0 0 14px rgba(255,190,40,.95); }
+  @keyframes fcring { to { transform:scale(5); opacity:0; border-width:1px; } }
+  .fc-spark { position:fixed; z-index:28; width:9px; height:9px; margin:-4.5px 0 0 -4.5px; border-radius:50%; background:radial-gradient(circle at 32% 30%, #fff 0 25%, rgba(170,210,255,.7) 60%, rgba(255,170,230,.6)); border:1px solid rgba(255,255,255,.95); pointer-events:none; animation:fcspark .6s ease-out forwards; } .fc-spark.gold { background:radial-gradient(circle at 32% 30%, #fff 0 22%, #ffe27a 60%, #ffb347); }
+  @keyframes fcspark { to { transform:translate(var(--dx), var(--dy)) scale(.2); opacity:0; } }
+  .fc-score { position:absolute; right:12px; top:10px; padding:6px 12px; border-radius:99px; background:linear-gradient(145deg, rgba(255,255,255,.9), rgba(255,255,255,.6)); border:1px solid #fff; box-shadow:0 4px 12px rgba(40,60,130,.2); font-weight:800; font-size:14px; color:#1a2547; z-index:2; }
+  .fc-score.pop { animation:fcscore .35s; } @keyframes fcscore { 40% { transform:scale(1.3); } }
+  /* нэрний бөмбөлөг: шилэн (цагаан ~60%, бага зэрэг бүдгэрүүлэлт, нимгэн цагаан хүрээ) — цэсийн хавтантай адил */
+  .fc-bubble { background:linear-gradient(145deg, rgba(255,255,255,.66), rgba(255,255,255,.5)); backdrop-filter:blur(8px) saturate(1.5); -webkit-backdrop-filter:blur(8px) saturate(1.5); border:1px solid rgba(255,255,255,.88); box-shadow:0 8px 22px rgba(40,60,130,.2), inset 0 1px 0 rgba(255,255,255,.95); color:#14204a; }
+  .fc-bubble::after { display:none; }
+  /* ---- Багшаас асуух ---- */
+  .qn .bm { width:34px !important; height:34px !important; padding:0; border-radius:50% !important; font-size:16px !important; line-height:1; display:grid; place-items:center; opacity:.6; transition:transform .15s, opacity .15s; }
+  .qn .bm.on { opacity:1; transform:scale(1.1); }
+  .track .qn .bm.on { background:#fff; border-color:#fff; box-shadow:0 3px 10px rgba(5,10,40,.35); }
+  .gl .tile.t3 { --tint:#ffb86b; } .gl .tile.t3 b { color:#1a2547; }
+  .ask { margin:0 14px 14px; padding:14px; border-radius:24px; background:linear-gradient(145deg, rgba(255,255,255,.86), rgba(255,255,255,.58)); border:1px solid #fff; box-shadow:0 8px 22px rgba(60,80,150,.16), inset 0 1px 0 #fff; color:#1a2547; }
+  .ask-h { display:flex; align-items:center; gap:8px; margin-bottom:8px; flex-wrap:wrap; } .ask-no { padding:3px 10px; border-radius:99px; background:linear-gradient(135deg, #5b7cff, #3d5afe); color:#fff; font-size:12px; font-weight:800; } .ask-ch { font-size:12px; color:#5a6a90; font-weight:700; }
+  .ask .art { margin-bottom:10px; } .ask .rq { margin:4px 0; font-size:16px; } .ask ol { margin:6px 0 10px; padding-left:22px; color:#5a6a90; font-size:14.5px; line-height:1.45; } .ask li.ok { color:#0c7a47; font-weight:800; }
+  .ask .why { background:rgba(255,255,255,.7); color:#1a2547; border:0; border-left:4px solid #5b7cff; } .ask .why b { color:#1a2547; }
+  .ask .nx.wide { width:100%; margin:6px 0 0; height:46px; line-height:46px; font-size:15px; }
+  .ask-note { margin:6px 22px 14px; font-size:13px; color:#5a6a90; line-height:1.4; }
+  .ask-empty { margin:40px 24px; padding:30px 20px; text-align:center; border-radius:26px; background:linear-gradient(145deg, rgba(255,255,255,.7), rgba(255,255,255,.4)); border:1px solid #fff; color:#1a2547; } .ask-empty p { color:#5a6a90; font-size:14px; line-height:1.5; }
+  .mg-btn { display:block; margin:14px auto 8px; padding:11px 24px; border-radius:99px; border:1px solid #fff; background:linear-gradient(145deg, rgba(255,255,255,.88), rgba(255,255,255,.5)); box-shadow:0 6px 16px rgba(60,80,150,.18), inset 0 1px 0 #fff; font:inherit; font-weight:800; font-size:14px; color:#1a2547; cursor:pointer; transition:transform .12s; } .mg-btn:active { transform:scale(.96); }
+  .mg-btn.on { background:linear-gradient(135deg, #6b8aff, #3d5afe); color:#fff; border-color:transparent; box-shadow:0 8px 20px rgba(61,90,254,.4); }
+  /* ---- Цэсний товчны дарах анимаци ---- */
+  .tile, .ch, .mg-btn { position:relative; overflow:hidden; transition:transform .12s ease; }
+  .tile:active, .ch:active, .mg-btn:active { transform:scale(.965); }
+  .blob { position:absolute; border-radius:50%; pointer-events:none; z-index:3; background:radial-gradient(circle, rgba(120,150,255,.34) 0, rgba(255,255,255,.55) 52%, rgba(255,255,255,.18) 72%, transparent 74%); border:1px solid rgba(255,255,255,.75); box-shadow:inset 0 0 14px rgba(255,255,255,.6), 0 0 18px rgba(120,150,255,.3); }
+  .rp { position:absolute; border-radius:50%; pointer-events:none; background:radial-gradient(circle, rgba(255,255,255,.95) 0, rgba(255,255,255,.55) 38%, rgba(160,190,255,.28) 66%, transparent 70%); transform:scale(0); opacity:.95; animation:rpl .62s ease-out forwards; z-index:3; }
+  @keyframes rpl { to { transform:scale(1); opacity:0; } }
+  .tile.tap { animation:tpress .26s ease; } @keyframes tpress { 0% { transform:scale(1); } 40% { transform:scale(.955); } 100% { transform:scale(1.015); } }
+  .tile.tap .ic, .ch.tap .no { animation:icpop .42s ease; } @keyframes icpop { 0% { transform:scale(1) rotate(0); } 40% { transform:scale(1.35) rotate(-12deg); } 70% { transform:scale(.95) rotate(6deg); } 100% { transform:scale(1) rotate(0); } }
+  .ch.tap { animation:tpress .26s ease; } .mg-btn.tap { animation:tpress .3s ease; }
+  .nope { animation:nope .38s ease; } @keyframes nope { 20% { transform:translateX(-7px); } 40% { transform:translateX(6px); } 60% { transform:translateX(-4px); } 80% { transform:translateX(3px); } }
+  /* ---- Цэвэрхэн үсгийн хэв (лавлах загвар шиг): нимгэн, хөнгөн, зөөлөн цэнхэр-саарал; хүнд тод (800-900) байхгүй ---- */
+  .phone.gl, .phone.gl button, .phone.gl .fc-colors, .fc-bubble, .fc-score, .mg-btn { font-family:-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Inter", "Segoe UI Variable Display", "Segoe UI Variable Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; text-rendering:optimizeLegibility; }
+  .gl .top h1 { font-size:16px; font-weight:600; letter-spacing:-.01em; color:#1d2748; }
+  .gl .top .cnt { font-weight:500; color:#3a4668; }
+  .gl .tile b { font-size:17px; font-weight:600; letter-spacing:-.012em; color:#1d2748; }
+  .gl .tile small { font-size:12.5px; font-weight:400; color:#6b7898; letter-spacing:0; }
+  .gl .ch .tx { font-size:15px; font-weight:600; letter-spacing:-.008em; color:#1d2748; } .gl .ch .tx small { font-size:12.5px; font-weight:400; color:#6b7898; }
+  .gl .ch .no { font-weight:600; font-size:17px; }
+  .gl .score .big { font-weight:300; font-size:76px; letter-spacing:-.03em; color:#1d2748; } .gl .score .big small { font-weight:300; font-size:28px; opacity:.55; }
+  .gl .score .verdict { font-size:22px; font-weight:600; letter-spacing:.03em; } .gl .score .pct { font-weight:500; color:#3a4668; } .gl .score .vnote { font-weight:500; font-size:13px; color:#3a4668; } .gl .score .meta { font-weight:400; }
+  .gl .nx.wide { font-weight:600; font-size:16px; letter-spacing:-.005em; } .gl .pv2.wide { font-weight:500; font-size:15px; }
+  .mg-btn { font-weight:600; letter-spacing:-.005em; } .fc-colors span { font-weight:400; }
+  .fc-bubble, .fc-bubble.sm { font-weight:600; letter-spacing:-.005em; } .fc-score { font-weight:600; }
+  .ask-no { font-weight:600; } .ask-ch { font-weight:500; } .ask .rq { font-weight:600; font-size:16px; letter-spacing:-.008em; } .ask ol { font-weight:400; } .ask li.ok { font-weight:600; } .ask .why { font-weight:400; } .ask .why b { font-weight:600; }
+  .ask-empty b { font-weight:600; } .ask-empty p { font-weight:400; }
+  /* ---- Шилэн дүрс: тунгалаг өнгөт шил дээр цагаан шугаман дүрс ---- */
+  .gi { position:absolute; top:14px; left:14px; width:46px; height:46px; border-radius:16px; display:grid; place-items:center; --g1:#8fa8ff; --g2:#5b7cff;
+    background:linear-gradient(145deg, color-mix(in srgb, var(--g1) 85%, #fff), color-mix(in srgb, var(--g2) 78%, transparent)); border:1px solid rgba(255,255,255,.85);
+    box-shadow:inset 0 1.5px 0 rgba(255,255,255,.9), inset 0 -6px 10px color-mix(in srgb, var(--g2) 45%, transparent), 0 8px 16px color-mix(in srgb, var(--g2) 38%, transparent); }
+  .gi::before { content:''; position:absolute; left:6px; right:6px; top:3px; height:15px; border-radius:12px 12px 20px 20px; background:linear-gradient(180deg, rgba(255,255,255,.55), rgba(255,255,255,0)); pointer-events:none; }
+  .gi svg { width:24px; height:24px; position:relative; filter:drop-shadow(0 1px 2px rgba(30,40,100,.35)); }
+  .gi.g-b { --g1:#9db4ff; --g2:#4f6bff; } .gi.g-s { --g1:#ffa7b8; --g2:#ff5d7c; } .gi.g-a { --g1:#ffc98a; --g2:#ff9a3c; } .gi.g-t { --g1:#f3a6ff; --g2:#b14dff; } .gi.g-l { --g1:#d3d9ea; --g2:#8d98b8; box-shadow:inset 0 1.5px 0 rgba(255,255,255,.9), 0 6px 12px rgba(90,100,140,.25); }
+  .tile.t0 .gi { left:auto; right:16px; top:14px; width:52px; height:52px; border-radius:18px; } .tile.t0 .gi svg { width:27px; height:27px; }
+  .tile.tap .gi { animation:icpop .42s ease; }
+  /* ---- Шалгалтын хавтан: бусдаас ялгарах ягаан-улаан шилэн (дүрс нь өөрийн ягаан) ---- */
+  .gl .tile.t0 { background:linear-gradient(135deg, rgba(255,120,170,.42), rgba(190,110,255,.38) 55%, rgba(255,255,255,.3)); border:1px solid rgba(255,255,255,.9); box-shadow:0 12px 30px rgba(220,70,140,.26), inset 0 1px 0 rgba(255,255,255,.95), inset 0 -18px 30px -16px rgba(200,80,255,.3); }
+  .gl .tile.t0::before { background:radial-gradient(circle, #ff8fc0 0%, transparent 68%); opacity:.9; width:190px; height:190px; right:-40px; top:-60px; }
+  .gl .tile.t0 b { color:#4a1450; font-weight:700; letter-spacing:-.015em; } .gl .tile.t0 small { color:#8a4a86; font-weight:500; }
+  /* шалгалтын хавтан: цайвар цэнхэр оруулсан хувилбар */
+  .gl .tile.t0 { background:linear-gradient(135deg, rgba(120,200,255,.5), rgba(150,140,255,.4) 55%, rgba(255,150,200,.3)); box-shadow:0 12px 30px rgba(80,140,230,.28), inset 0 1px 0 rgba(255,255,255,.95), inset 0 -18px 30px -16px rgba(110,170,255,.35); }
+  .gl .tile.t0::before { background:radial-gradient(circle, #8fd3ff 0%, transparent 68%); }
+  .gl .tile.t0 b { color:#16305c; } .gl .tile.t0 small { color:#4a6a9e; }
+  .gl .gi.g-t { --g1:#8fd3ff; --g2:#4f8bff; }
+  /* Mini game товч: тунгалаг шил */
+  .gl .mg-btn, .mg-btn { background:linear-gradient(145deg, rgba(255,255,255,.38), rgba(255,255,255,.12)); border:1px solid rgba(255,255,255,.75); backdrop-filter:blur(10px) saturate(1.5); -webkit-backdrop-filter:blur(10px) saturate(1.5); box-shadow:0 6px 18px rgba(60,80,150,.12), inset 0 1px 0 rgba(255,255,255,.85); color:#26335c; }
+  .mg-btn.on { background:linear-gradient(145deg, rgba(110,140,255,.55), rgba(110,140,255,.3)); color:#fff; border-color:rgba(255,255,255,.8); box-shadow:0 8px 22px rgba(61,90,254,.3), inset 0 1px 0 rgba(255,255,255,.8); }
+  /* ---- Бүлгийн жагсаалт: жижиг, цэгцтэй үсэг ---- */
+  .gl .ch { gap:11px; margin:0 14px 8px; padding:9px 12px; border-radius:18px; align-items:center; }
+  .gl .ch .no { width:34px; height:34px; border-radius:12px; font-size:14.5px; font-weight:600; }
+  .gl .ch .tx { font-size:13.5px; font-weight:600; line-height:1.28; letter-spacing:-.005em; text-wrap:balance; }
+  .gl .ch .tx small { margin-top:2px; font-size:11.5px; font-weight:400; letter-spacing:0; }
+  .gl .ch .go { font-size:18px; opacity:.8; }
+  /* ---- Асуултын дэлгэц: жижиг, цэгцтэй үсэг ---- */
+  .track .qc, .track .q, .track .opt, .phone.exam .track { font-family:-apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", "Segoe UI Variable Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; -webkit-font-smoothing:antialiased; }
+  .track .q { font-size:14.5px; font-weight:600; line-height:1.36; letter-spacing:-.005em; padding:10px 13px; }
+  .track .opt { font-size:13.5px; font-weight:400; line-height:1.32; padding:8px 4px; gap:10px; }
+  .track .opt .n { width:23px; height:23px; font-size:11.5px; font-weight:600; }
+  .track .opt .m { font-size:16px; }
+  .track .why { font-size:12.5px; line-height:1.4; } .track .why b { font-size:12.5px; }
+  .track .qn span { font-size:11.5px; font-weight:600; }
+  /* ---- Гүйцэтгэл (утсан дээр гацаж байсан): backdrop-filter, blur хөдөлгөөн, хүнд сүүдрийг авсан. Шилэн харагдах байдал хагас тунгалаг градиентээр хэвээр ---- */
+  .gl .hero, .gl .tile, .gl .ch, .gl .top .back, .gl .top .cnt, .gl .score, .gl .pv2.wide, .gl .mg-btn, .mg-btn, .fc-bubble, .fc-colors i { backdrop-filter:none !important; -webkit-backdrop-filter:none !important; }
+  .gl .hero, .gl .tile, .gl .score { background-color:rgba(255,255,255,.55); }
+  .gl .tile, .gl .ch, .gl .hero { box-shadow:0 4px 12px rgba(60,80,150,.14), inset 0 1px 0 rgba(255,255,255,.9); }
+  .gl .tile::before { display:none; }
+  .gl .tile.t0, .gl .tile.catB, .gl .tile.catC, .gl .tile.t1, .gl .tile.t2, .gl .tile.t3 { background-color:rgba(255,255,255,.6); }
+  .gl .ch { background:rgba(255,255,255,.72); }
+  .fc-bubble { background:rgba(255,255,255,.9); }
+  .gl .gi { box-shadow:inset 0 1.5px 0 rgba(255,255,255,.9), 0 3px 8px color-mix(in srgb, var(--g2) 35%, transparent); }
+  /* зураг томруулах */
+  .track .art { position:relative; cursor:zoom-in; }
+  .track .art::after { content:'⤢'; position:absolute; right:8px; bottom:8px; width:26px; height:26px; border-radius:8px; background:rgba(5,10,40,.6); color:#fff; font-size:16px; display:grid; place-items:center; pointer-events:none; }
+  .lb { position:fixed; inset:0; z-index:50; background:#030612; display:flex; align-items:center; justify-content:center; overflow:hidden; touch-action:none; }
+  .lbc { width:100vw; transform-origin:center center; will-change:transform; } .lbc svg, .lbc canvas { display:block; width:100%; height:auto; }
+  .lbx { position:absolute; top:calc(10px + env(safe-area-inset-top)); right:12px; z-index:2; width:44px; height:44px; border-radius:50%; border:1px solid rgba(255,255,255,.35); background:rgba(255,255,255,.14); color:#fff; font-size:20px; cursor:pointer; }
+
+  /* ===== Premium Aurora Glass 2.0 — туршилт: зөвхөн B ангиллын тестийн дэлгэц (.phone.au) ===== */
+  .phone.au { --au-ice:#DCEBFF; --au-lav:#E7DFFF; --au-blush:#F9DFEF; --au-mint:#DDF7F1; --au-pearl:#F8FAFF; --au-ink:#172344; --au-sub:#526587;
+    --au-card:linear-gradient(180deg,#ffffff 0%,#F4F7FF 100%); --au-edge:0 0 0 1px rgba(255,255,255,.95) inset;
+    --au-shadow:0 1px 2px rgba(23,35,68,.06), 0 6px 14px rgba(23,35,68,.08), 0 16px 32px rgba(88,102,190,.12);
+    background:linear-gradient(160deg,var(--au-ice) 0%,var(--au-lav) 38%,var(--au-blush) 72%,var(--au-mint) 100%); color:var(--au-ink); }
+  body:has(.phone.au) { background:#E4EBFA; }
+  .phone.au .hd { background:var(--au-pearl); backdrop-filter:none; border-bottom:1px solid rgba(23,35,68,.08); box-shadow:0 4px 14px rgba(88,102,190,.10); }
+  .phone.au .top h1 { color:var(--au-ink); }
+  .phone.au .top .back, .phone.au .top .cnt { background:var(--au-card); backdrop-filter:none; border:1px solid #fff; color:#3b4fb8; box-shadow:var(--au-shadow); border-radius:14px; }
+  .phone.au .top .cnt { color:var(--au-ink); }
+  .phone.au .prog { background:rgba(23,35,68,.10); }
+  .phone.au .prog i { background:linear-gradient(90deg,#6ea8ff,#a98cff 55%,#ff97cc); transition:width .3s ease; }
+  .phone.au .track { background:none; }
+  .phone.au .track .qc { color:var(--au-ink); }
+  .phone.au .qn span { color:var(--au-ink); }
+  .phone.au .qn .bm { background:var(--au-card); border:1px solid #fff; color:var(--au-sub); box-shadow:var(--au-shadow); }
+  .phone.au .qn .bm.on { color:#3b4fb8; }
+  .phone.au .track .art { background:var(--au-card); padding:6px; border:1px solid #fff; border-radius:24px; box-shadow:var(--au-edge), var(--au-shadow); }
+  .phone.au .art svg, .phone.au .art canvas { border-radius:18px; }
+  .phone.au .track .q { background:linear-gradient(135deg,#C9E5FF 0%,#E1D5FF 100%); color:#182C55; border:1px solid #fff; border-left:6px solid var(--ch); border-radius:15px; box-shadow:0 2px 8px rgba(88,102,190,.10); }
+  .phone.au .track .opt { background:#FFFFFF; color:#172344; border:1px solid #E2E8F5; border-radius:13px; box-shadow:none; padding:9px 12px; margin-bottom:7px; gap:11px; transition:transform .15s ease, border-color .15s ease, background .15s ease; }
+  .phone.au .track .opt .n { width:26px; height:26px; background:#DCEBFF; color:#2a4aa8; font-size:13px; font-weight:800; box-shadow:none; }
+  .phone.au .track .opt:hover:not([disabled]) { background:#F3F7FF; border-color:#9db4ee; }
+  .phone.au .track .opt:active:not([disabled]) { transform:scale(.98); }
+  .phone.au .track .opt.sel { background:#EDF3FF; border:1.5px solid #3f6ef0; }
+  .phone.au .track .opt.sel .n { background:#3f6ef0; color:#fff; }
+  .phone.au .track .opt.ok { background:#E6F8F0; border:1.5px solid #2fb985; color:#0d4a37; }
+  .phone.au .track .opt.ok .n { background:#2fb985; color:#fff; }
+  .phone.au .track .opt.bad { background:#FFEBEF; border:1.5px solid #f0708a; color:#7a1d33; }
+  .phone.au .track .opt.bad .n { background:#f0708a; color:#fff; }
+  .phone.au .track .why { background:var(--au-card); color:#2f4268; border:1px solid #fff; border-left:5px solid var(--ch); border-radius:18px; box-shadow:var(--au-edge), var(--au-shadow); }
+  .phone.au .track .why b { color:var(--au-ink); }
+  .phone.au .bar { background:var(--au-pearl); backdrop-filter:none; border-top:1px solid rgba(23,35,68,.08); box-shadow:0 -4px 14px rgba(88,102,190,.10); }
+  .phone.au .bar .bm, .phone.au .bar .pv { background:var(--au-card); border:1px solid #fff; color:var(--au-ink); box-shadow:var(--au-shadow); }
+  .phone.au .bar .bm.on { color:#3b4fb8; }
+  .phone.au .endmark { color:var(--au-sub); }
+  @media (prefers-reduced-motion:reduce) { .phone.au *, .phone.au *::before { transition:none !important; animation:none !important; } }
+
+  /* ===== Premium Crystal Glass — туршилт: зөвхөн нүүр хуудас (.phone.gl.cr) ===== */
+  .phone.gl.cr { --cr-edge:rgba(255,255,255,.92); --cr-sh:0 1px 2px rgba(60,80,160,.08), 0 8px 22px rgba(70,90,170,.13); }
+  .phone.gl.cr .hero, .phone.gl.cr .tile:not(.soon) {
+    background:linear-gradient(180deg, rgba(255,255,255,.62) 0%, rgba(255,255,255,0) 46%), linear-gradient(150deg, rgba(255,255,255,.58) 0%, rgba(235,243,255,.30) 55%, rgba(255,255,255,.48) 100%);
+    border:1px solid var(--cr-edge); border-radius:24px;
+    backdrop-filter:blur(12px) saturate(1.4); -webkit-backdrop-filter:blur(12px) saturate(1.4);
+    box-shadow:var(--cr-sh), inset 0 1px 0 #fff, inset 0 -1px 0 rgba(130,160,230,.14); }
+  .phone.gl.cr .tile:not(.soon), .phone.gl.cr .mg-btn { transition:transform .15s ease; }
+  .phone.gl.cr .tile:not(.soon):active, .phone.gl.cr .mg-btn:active { transform:scale(.97); }
+  .phone.gl.cr .tile::before { opacity:.5; width:130px; height:130px; right:-34px; top:-44px; }
+  .phone.gl.cr .tile.catB, .phone.gl.cr .tile.t1 { --tint:#b4c5ff; } .phone.gl.cr .tile.catC, .phone.gl.cr .tile.t2 { --tint:#a8ece0; } .phone.gl.cr .tile.t3 { --tint:#ffd2a0; }
+  .phone.gl.cr .hero img { box-shadow:0 4px 12px rgba(60,80,150,.16); }
+  .phone.gl.cr .mg-btn { background:linear-gradient(180deg, rgba(255,255,255,.9) 0%, rgba(255,255,255,.5) 100%); border:1px solid var(--cr-edge);
+    backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); box-shadow:var(--cr-sh), inset 0 1px 0 #fff; }
+  @media (prefers-reduced-motion:reduce) { .phone.gl.cr .tile, .phone.gl.cr .mg-btn { transition:none; } }
+
+  /* ===== Premium Crystal Glass — нэгдсэн стандарт (нүүр, бүлгийн жагсаалт, тестийн дэлгэц) ===== */
+  .phone.gl.cr, .phone.au { --cr-edge:rgba(255,255,255,.92); --cr-sh:0 1px 2px rgba(60,80,160,.08), 0 8px 22px rgba(70,90,170,.13); --cr-sh-sm:0 1px 2px rgba(60,80,160,.07), 0 4px 12px rgba(70,90,170,.10);
+    --cr-gloss:linear-gradient(180deg, rgba(255,255,255,.62) 0%, rgba(255,255,255,0) 46%); --au-shadow:var(--cr-sh); }
+  /* бүлгийн жагсаалтын мөр */
+  .phone.gl.cr .ch { background:var(--cr-gloss), linear-gradient(150deg, rgba(255,255,255,.66) 0%, rgba(235,243,255,.40) 60%, rgba(255,255,255,.55) 100%);
+    border:1px solid var(--cr-edge); border-radius:20px; backdrop-filter:none; -webkit-backdrop-filter:none;
+    box-shadow:var(--cr-sh-sm), inset 0 1px 0 #fff, inset 0 -1px 0 rgba(130,160,230,.12); transition:transform .15s ease; }
+  .phone.gl.cr .ch:not(.soon):active { transform:scale(.98); }
+  .phone.gl.cr .top .back, .phone.gl.cr .top .cnt { background:var(--cr-gloss), linear-gradient(150deg, rgba(255,255,255,.7), rgba(235,243,255,.45));
+    border:1px solid var(--cr-edge); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); box-shadow:var(--cr-sh-sm), inset 0 1px 0 #fff; }
+  /* тестийн дэлгэц (B, C/D/E): ижил стандарт */
+  .phone.au .hd { background:linear-gradient(180deg, #ffffff 0%, #F1F5FF 100%); }
+  .phone.au .bar { background:linear-gradient(180deg, #F6F9FF 0%, #EAF0FF 100%); }
+  .phone.au .track .q { background:var(--cr-gloss), linear-gradient(135deg, #C9E5FF 0%, #E1D5FF 100%); box-shadow:var(--cr-sh-sm), inset 0 1px 0 rgba(255,255,255,.9); }
+  .phone.au .track .art { background:var(--cr-gloss), linear-gradient(180deg,#fff 0%,#F4F7FF 100%); border:1px solid var(--cr-edge); box-shadow:var(--cr-sh), inset 0 1px 0 #fff; }
+  .phone.au .track .opt { box-shadow:inset 0 1px 0 #fff; }
+  .phone.au .track .why { box-shadow:var(--cr-sh-sm), inset 0 1px 0 #fff; }
+  .phone.au .bar .nx { box-shadow:var(--cr-sh-sm), inset 0 1px 0 rgba(255,255,255,.7); }
+  @media (prefers-reduced-motion:reduce) { .phone.gl.cr .ch { transition:none; } }
+
+  /* ===== Өдөр / Шөнө горим: Dark Crystal Glass (data-theme="dark"). Өдрийн горим дээрх CSS хэвээр. ===== */
+  html[data-theme="dark"] { color-scheme:dark; }
+  html.thm-anim *, html.thm-anim *::before, html.thm-anim *::after { transition:background-color .25s ease, color .25s ease, border-color .25s ease, box-shadow .25s ease, opacity .25s ease !important; }
+  .thm { position:absolute; right:10px; top:-7px; z-index:3; width:30px; height:30px; padding:0; border-radius:50%; cursor:pointer; display:grid; place-items:center;
+    border:1px solid rgba(255,255,255,.92); background:linear-gradient(180deg, rgba(255,255,255,.95), rgba(228,238,255,.75)); color:#3d5afe;
+    box-shadow:0 1px 2px rgba(60,80,160,.10), 0 4px 12px rgba(70,90,170,.14), inset 0 1px 0 #fff; transition:transform .15s ease; }
+  .thm:active { transform:scale(.92); } .thm svg { width:16px; height:16px; } .thm .mn { display:none; }
+  html[data-theme="dark"] .thm { background:linear-gradient(180deg, rgba(60,78,122,.9), rgba(35,47,75,.9)); border-color:rgba(190,210,255,.28); color:#FFD76A; box-shadow:0 4px 12px rgba(0,0,0,.4), inset 0 1px 0 rgba(190,210,255,.3); }
+  html[data-theme="dark"] .thm .sn { display:none; } html[data-theme="dark"] .thm .mn { display:block; }
+  @media (prefers-reduced-motion:reduce) { .thm { transition:none; } html.thm-anim *, html.thm-anim *::before, html.thm-anim *::after { transition:none !important; } }
+
+  /* --- нүүр хуудас --- */
+  html[data-theme="dark"] body:has(.phone.gl), html[data-theme="dark"] body:has(.phone.au) { background:#0B1020; }
+  html[data-theme="dark"] .phone.gl.cr { --ink:#F1F5FF; --dim:#B8C5E0; --cr-edge:rgba(190,210,255,.22); --cr-sh:0 1px 2px rgba(0,0,0,.4), 0 8px 22px rgba(0,0,0,.34); --cr-sh-sm:0 1px 2px rgba(0,0,0,.35), 0 4px 12px rgba(0,0,0,.28);
+    --cr-gloss:linear-gradient(180deg, rgba(190,210,255,.13) 0%, rgba(190,210,255,0) 46%); color:#F1F5FF;
+    background:radial-gradient(60% 34% at 10% 4%, rgba(90,120,230,.26) 0%, transparent 70%), radial-gradient(55% 32% at 94% 12%, rgba(150,110,240,.20) 0%, transparent 70%), radial-gradient(60% 36% at 86% 62%, rgba(230,110,170,.10) 0%, transparent 72%), linear-gradient(180deg, #0B1020, #141D33); }
+  html[data-theme="dark"] .phone.gl.cr .hero, html[data-theme="dark"] .phone.gl.cr .tile:not(.soon) {
+    background:var(--cr-gloss), linear-gradient(150deg, rgba(40,54,88,.86) 0%, rgba(30,42,72,.80) 100%); border:1px solid var(--cr-edge);
+    box-shadow:var(--cr-sh), inset 0 1px 0 rgba(190,210,255,.26), inset 0 -1px 0 rgba(0,0,0,.25); }
+  html[data-theme="dark"] .phone.gl.cr .tile.soon { background:rgba(35,47,75,.45); border-color:rgba(190,210,255,.28); }
+  html[data-theme="dark"] .phone.gl.cr .tile b, html[data-theme="dark"] .phone.gl.cr .tile.t0 b { color:#F1F5FF; }
+  html[data-theme="dark"] .phone.gl.cr .tile small, html[data-theme="dark"] .phone.gl.cr .tile.t0 small { color:#B8C5E0; }
+  html[data-theme="dark"] .phone.gl.cr .tile::before { opacity:.3; }
+  html[data-theme="dark"] .phone.gl.cr .hero::after { background:radial-gradient(circle, rgba(131,168,248,.22), transparent 70%); }
+  html[data-theme="dark"] .phone.gl.cr .mg-btn { background:var(--cr-gloss), linear-gradient(150deg, rgba(40,54,88,.9), rgba(30,42,72,.85)); color:#F1F5FF; border-color:var(--cr-edge); }
+
+  /* --- тестийн дэлгэц (B, C/D/E) --- */
+  html[data-theme="dark"] .phone.au { --cr-edge:rgba(190,210,255,.22); --cr-sh:0 1px 2px rgba(0,0,0,.4), 0 8px 22px rgba(0,0,0,.34); --cr-sh-sm:0 1px 2px rgba(0,0,0,.35), 0 4px 12px rgba(0,0,0,.28); --au-shadow:var(--cr-sh);
+    --cr-gloss:linear-gradient(180deg, rgba(190,210,255,.12) 0%, rgba(190,210,255,0) 46%); --au-ink:#F1F5FF; --au-sub:#B8C5E0; color:#F1F5FF;
+    background:radial-gradient(60% 30% at 10% 4%, rgba(90,120,230,.22) 0%, transparent 70%), radial-gradient(55% 30% at 94% 14%, rgba(150,110,240,.16) 0%, transparent 70%), radial-gradient(60% 34% at 86% 70%, rgba(230,110,170,.08) 0%, transparent 72%), linear-gradient(180deg, #0B1020, #141D33); }
+  html[data-theme="dark"] .phone.au .hd { background:linear-gradient(180deg, #172036, #121A2D); border-bottom:1px solid rgba(190,210,255,.12); box-shadow:0 4px 14px rgba(0,0,0,.35); }
+  html[data-theme="dark"] .phone.au .top h1 { color:#F1F5FF; }
+  html[data-theme="dark"] .phone.au .top .back, html[data-theme="dark"] .phone.au .top .cnt { background:var(--cr-gloss), linear-gradient(150deg, rgba(48,64,102,.95), rgba(32,44,74,.95)); border:1px solid var(--cr-edge); color:#BFD3FF; box-shadow:var(--cr-sh-sm), inset 0 1px 0 rgba(190,210,255,.22); }
+  html[data-theme="dark"] .phone.au .top .cnt { color:#F1F5FF; }
+  html[data-theme="dark"] .phone.au .prog { background:rgba(190,210,255,.16); }
+  html[data-theme="dark"] .phone.au .track .qc { color:#F1F5FF; }
+  html[data-theme="dark"] .phone.au .qn span { color:#0B1020; }
+  html[data-theme="dark"] .phone.au .qn .bm { background:linear-gradient(150deg, rgba(48,64,102,.95), rgba(32,44,74,.95)); border:1px solid var(--cr-edge); color:#B8C5E0; box-shadow:var(--cr-sh-sm); }
+  html[data-theme="dark"] .phone.au .qn .bm.on { color:#FFD76A; }
+  html[data-theme="dark"] .phone.au .track .art { background:var(--cr-gloss), linear-gradient(180deg, #1E2A47, #18223C); border:1px solid var(--cr-edge); box-shadow:var(--cr-sh), inset 0 1px 0 rgba(190,210,255,.22); }
+  html[data-theme="dark"] .phone.au .track .q { background:var(--cr-gloss), linear-gradient(135deg, #263A72 0%, #35296E 100%); color:#F1F5FF; border:1px solid var(--cr-edge); border-left:6px solid var(--ch); box-shadow:var(--cr-sh-sm), inset 0 1px 0 rgba(190,210,255,.22); }
+  html[data-theme="dark"] .phone.au .track .opt { background:#1E2A47; color:#F1F5FF; border:1px solid rgba(190,210,255,.18); box-shadow:inset 0 1px 0 rgba(190,210,255,.10); }
+  html[data-theme="dark"] .phone.au .track .opt .n { background:rgba(131,168,248,.22); color:#C9DAFF; box-shadow:none; }
+  html[data-theme="dark"] .phone.au .track .opt:hover:not([disabled]) { background:#24335A; border-color:#83A8F8; }
+  html[data-theme="dark"] .phone.au .track .opt.sel { background:#22325E; border:1.5px solid #83A8F8; }
+  html[data-theme="dark"] .phone.au .track .opt.sel .n { background:#83A8F8; color:#0B1020; }
+  html[data-theme="dark"] .phone.au .track .opt.ok { background:#0F3A2C; border:1.5px solid #2fb985; color:#CFF5E4; }
+  html[data-theme="dark"] .phone.au .track .opt.ok .n { background:#2fb985; color:#06210f; }
+  html[data-theme="dark"] .phone.au .track .opt.bad { background:#451C2B; border:1.5px solid #f0708a; color:#FFD3DC; }
+  html[data-theme="dark"] .phone.au .track .opt.bad .n { background:#f0708a; color:#2a0a14; }
+  html[data-theme="dark"] .phone.au .track .why { background:#1A2540; color:#D5DFF5; border:1px solid var(--cr-edge); border-left:5px solid var(--ch); box-shadow:var(--cr-sh-sm); }
+  html[data-theme="dark"] .phone.au .track .why b { color:#F1F5FF; }
+  html[data-theme="dark"] .phone.au .bar { background:linear-gradient(180deg, #141D33, #0F1729); border-top:1px solid rgba(190,210,255,.12); box-shadow:0 -4px 14px rgba(0,0,0,.35); }
+  html[data-theme="dark"] .phone.au .bar .bm, html[data-theme="dark"] .phone.au .bar .pv { background:linear-gradient(150deg, rgba(48,64,102,.95), rgba(32,44,74,.95)); border:1px solid var(--cr-edge); color:#F1F5FF; box-shadow:var(--cr-sh-sm); }
+  html[data-theme="dark"] .phone.au .bar .bm.on { color:#FFD76A; }
+  html[data-theme="dark"] .phone.au .endmark { color:#B8C5E0; }
+
+  /* ===== Шалгалт (au) ба бусад дэлгэцийн Crystal Glass, Шөнийн горим ===== */
+  .phone.au .cnt.warn { background:linear-gradient(180deg,#FFE5EA,#FFD0D9); color:#8a1a30; border-color:#f0708a; }
+  .phone.au .bar .pc { color:#526587; }
+  .phone.au .skip { color:#8a1a30; background:rgba(240,112,138,.22); }
+  html[data-theme="dark"] .phone.au .cnt.warn { background:linear-gradient(180deg,#6a2238,#4b1828); color:#FFD3DC; border-color:#f0708a; }
+  html[data-theme="dark"] .phone.au .bar .pc { color:#B8C5E0; }
+  html[data-theme="dark"] .phone.au .skip { color:#FFD3DC; background:rgba(240,112,138,.28); }
+
+  html[data-theme="dark"] .phone.gl.cr .top h1 { color:#F1F5FF; }
+  html[data-theme="dark"] .phone.gl.cr .top .back, html[data-theme="dark"] .phone.gl.cr .top .cnt { background:var(--cr-gloss), linear-gradient(150deg, rgba(48,64,102,.95), rgba(32,44,74,.95)); border:1px solid var(--cr-edge); color:#BFD3FF; box-shadow:var(--cr-sh-sm), inset 0 1px 0 rgba(190,210,255,.22); }
+  html[data-theme="dark"] .phone.gl.cr .top .cnt { color:#F1F5FF; }
+  html[data-theme="dark"] .phone.gl.cr .ch { background:var(--cr-gloss), linear-gradient(150deg, rgba(40,54,88,.86) 0%, rgba(30,42,72,.80) 100%); border:1px solid var(--cr-edge); box-shadow:var(--cr-sh-sm), inset 0 1px 0 rgba(190,210,255,.24), inset 0 -1px 0 rgba(0,0,0,.22); }
+  html[data-theme="dark"] .phone.gl.cr .ch .tx { color:#F1F5FF; } html[data-theme="dark"] .phone.gl.cr .ch .tx small { color:#B8C5E0; }
+  html[data-theme="dark"] .phone.gl.cr .ch.soon .no { background:rgba(150,170,210,.25); }
+  html[data-theme="dark"] .phone.gl .sec, html[data-theme="dark"] .phone.gl.cr .sec { color:#B8C5E0; }
+  html[data-theme="dark"] .phone.gl.cr .tile.t0 b { color:#F1F5FF; }
+
+  /* шалгалтын дүн, багшаас асуух, mini game (phone.gl.cr) */
+  html[data-theme="dark"] .phone.gl.cr .score { background:var(--cr-gloss), linear-gradient(150deg, rgba(40,54,88,.88), rgba(30,42,72,.82)); border:1px solid var(--cr-edge); color:#F1F5FF; box-shadow:var(--cr-sh), inset 0 1px 0 rgba(190,210,255,.24); }
+  html[data-theme="dark"] .phone.gl.cr .score .big, html[data-theme="dark"] .phone.gl.cr .score .pct, html[data-theme="dark"] .phone.gl.cr .score .vnote { color:#F1F5FF; }
+  html[data-theme="dark"] .phone.gl.cr .score .meta { color:#B8C5E0; }
+  html[data-theme="dark"] .phone.gl.cr .score.pass { background:var(--cr-gloss), linear-gradient(150deg, rgba(20,110,76,.85), rgba(14,70,56,.85)); border-color:rgba(90,230,170,.45); }
+  html[data-theme="dark"] .phone.gl.cr .score.fail { background:var(--cr-gloss), linear-gradient(150deg, rgba(150,40,66,.85), rgba(90,24,44,.85)); border-color:rgba(255,130,150,.45); }
+  html[data-theme="dark"] .phone.gl.cr .score.pass .verdict { color:#BFF5DC; } html[data-theme="dark"] .phone.gl.cr .score.fail .verdict { color:#FFD3DC; }
+  html[data-theme="dark"] .phone.gl.cr .pv2.wide { background:linear-gradient(150deg, rgba(48,64,102,.95), rgba(32,44,74,.95)); border:1px solid var(--cr-edge); color:#F1F5FF; }
+  html[data-theme="dark"] .phone.gl.cr .ask, html[data-theme="dark"] .phone.gl.cr .ask-empty { background:var(--cr-gloss), linear-gradient(150deg, rgba(40,54,88,.88), rgba(30,42,72,.82)); border:1px solid var(--cr-edge); color:#F1F5FF; box-shadow:var(--cr-sh), inset 0 1px 0 rgba(190,210,255,.24); }
+  html[data-theme="dark"] .phone.gl.cr .ask ol, html[data-theme="dark"] .phone.gl.cr .ask-note { color:#B8C5E0; } html[data-theme="dark"] .phone.gl.cr .ask li.ok { color:#6FE0A8; }
+  html[data-theme="dark"] .phone.gl.cr .ask .why { background:#1A2540; color:#D5DFF5; border-left-color:#83A8F8; } html[data-theme="dark"] .phone.gl.cr .ask .why b { color:#F1F5FF; }
+  html[data-theme="dark"] .phone.gl.cr .ask .art { background:#1E2A47; border:1px solid var(--cr-edge); }
+  html[data-theme="dark"] .phone.gl.cr .mg-btn.on { background:linear-gradient(145deg, rgba(110,140,255,.7), rgba(110,140,255,.4)); color:#fff; }
+  html[data-theme="dark"] .fc-colors { color:#B8C5E0; } html[data-theme="dark"] .fc-colors i { background:rgba(190,210,255,.14); }
+  html[data-theme="dark"] .fc-score { background:linear-gradient(150deg, rgba(48,64,102,.95), rgba(32,44,74,.95)); border-color:rgba(190,210,255,.28); color:#F1F5FF; box-shadow:0 4px 12px rgba(0,0,0,.4); }
+  html[data-theme="dark"] .fc-bubble { background:linear-gradient(150deg, rgba(48,64,102,.96), rgba(32,44,74,.96)); border-color:rgba(190,210,255,.3); color:#F1F5FF; box-shadow:0 6px 16px rgba(0,0,0,.45); }
+  html[data-theme="dark"] .phone.gl.cr .ask-empty p { color:#B8C5E0; }
+
+  /* ===== «Миний ахиц» (Crystal Glass, өдөр/шөнө) ===== */
+  .tile.t4 .gi, .gi.g-p { --g1:#cdbfff; --g2:#7c5cff; } .phone.gl.cr .tile.t4 { --tint:#d6c9ff; }
+  .mg-row { display:flex; justify-content:center; align-items:center; gap:10px; margin:14px 0 8px; }
+  .mg-row .mg-btn { margin:0; }
+  .mg-row .thm { position:relative; right:auto; top:auto; width:42px; height:42px; flex:none; }
+  .mg-row .thm svg { width:20px; height:20px; }
+  .pg-tabs { display:flex; gap:6px; margin:2px 14px 12px; padding:4px; border-radius:18px; background:var(--cr-gloss), linear-gradient(150deg, rgba(255,255,255,.72), rgba(235,243,255,.45)); border:1px solid var(--cr-edge); box-shadow:var(--cr-sh-sm), inset 0 1px 0 #fff; }
+  .pg-tabs button { flex:1; height:38px; border:0; border-radius:14px; background:transparent; font:inherit; font-weight:600; font-size:14px; color:var(--dim); cursor:pointer; transition:background-color .2s, color .2s; }
+  .pg-tabs button.on { background:linear-gradient(180deg, #86a0ff, #5b7cff); color:#fff; box-shadow:0 3px 10px rgba(61,90,254,.28), inset 0 1px 0 rgba(255,255,255,.45); }
+  .pg-card, .pg-row { background:var(--cr-gloss), linear-gradient(150deg, rgba(255,255,255,.66) 0%, rgba(235,243,255,.40) 60%, rgba(255,255,255,.55) 100%); border:1px solid var(--cr-edge); box-shadow:var(--cr-sh-sm), inset 0 1px 0 #fff, inset 0 -1px 0 rgba(130,160,230,.12); color:var(--ink); }
+  .pg-card { margin:0 14px 12px; padding:14px; border-radius:22px; }
+  .pg-card h2 { margin:0 0 8px; font-size:15px; font-weight:600; color:var(--ink); }
+  .pg-sum { display:flex; align-items:center; gap:16px; }
+  .phone.gl.cr { --ring-in:#f3f6ff; --ok:#1fa971; --no:#e0476b; }
+  .pg-ring { --p:0; width:112px; height:112px; border-radius:50%; flex:none; display:grid; place-content:center; text-align:center; background:radial-gradient(closest-side, var(--ring-in) 76%, transparent 78%), conic-gradient(#2fb985 calc(var(--p) * 1%), rgba(120,140,190,.24) 0); }
+  .pg-ring b { font-size:24px; font-weight:600; line-height:1.1; } .pg-ring small { font-size:11px; color:var(--dim); }
+  .pg-stats { flex:1; display:grid; gap:8px; } .pg-stats div { display:flex; flex-direction:row-reverse; justify-content:space-between; align-items:baseline; }
+  .pg-stats b { font-size:20px; font-weight:600; } .pg-stats b.g { color:var(--ok); } .pg-stats b.r { color:var(--no); } .pg-stats small { font-size:13px; color:var(--dim); }
+  .pg-chart { width:100%; height:auto; display:block; } .pg-chart text { font-size:8px; fill:var(--dim); }
+  .pg-chart .g { stroke:rgba(120,140,190,.28); stroke-width:1; } .pg-chart .th { stroke:#f0a13a; stroke-width:1; stroke-dasharray:4 3; }
+  .pg-chart .ln { fill:none; stroke:#8a9bff; stroke-width:1.8; stroke-linejoin:round; } .pg-chart circle { stroke:#fff; stroke-width:1.2; } .pg-chart circle.ok { fill:#2fb985; } .pg-chart circle.no { fill:#e0476b; }
+  .pg-legend { display:flex; flex-wrap:wrap; gap:4px 12px; margin-top:6px; font-size:11.5px; color:var(--dim); } .pg-legend i { display:inline-block; width:8px; height:8px; border-radius:50%; margin-right:5px; vertical-align:0; }
+  .pg-legend i.ok { background:#2fb985; } .pg-legend i.no { background:#e0476b; } .pg-legend i.th { background:#f0a13a; border-radius:2px; width:12px; height:3px; vertical-align:3px; }
+  .pg-row { display:flex; align-items:center; gap:10px; margin:0 14px 8px; padding:11px 13px; border-radius:18px; text-decoration:none; border-left:4px solid var(--ok); transition:transform .15s ease; }
+  .pg-row.f { border-left-color:var(--no); } .pg-row:active { transform:scale(.98); }
+  .pg-main { flex:1; min-width:0; } .pg-main b { font-size:16px; font-weight:600; } .pg-main small { display:block; margin:1px 0 6px; font-size:12px; color:var(--dim); }
+  .pg-chips { display:flex; flex-wrap:wrap; gap:5px; } .pg-chips span { font-size:12px; padding:2px 8px; border-radius:99px; background:rgba(120,140,190,.16); color:var(--dim); }
+  .pg-chips .c-ok { color:#12805a; background:rgba(47,185,133,.16); } .pg-chips .c-bad { color:#b02348; background:rgba(240,112,138,.16); }
+  .pg-badge { font-style:normal; font-size:11px; font-weight:800; letter-spacing:.3px; padding:5px 10px; border-radius:99px; flex:none; }
+  .pg-row.p .pg-badge { color:#12805a; background:rgba(47,185,133,.18); } .pg-row.f .pg-badge { color:#b02348; background:rgba(240,112,138,.18); }
+  .pg-empty { text-align:center; padding:28px 18px; } .pg-empty .pg-ic { font-size:34px; margin-bottom:6px; } .pg-empty b { font-size:16px; font-weight:600; } .pg-empty p { margin:8px 0 0; font-size:13.5px; color:var(--dim); line-height:1.45; }
+  .pg-warn { color:#b02348; font-size:13px; }
+  .pg-toast { position:fixed; left:14px; right:14px; bottom:calc(18px + env(safe-area-inset-bottom)); z-index:60; padding:12px 14px; border-radius:16px; background:#3a1220; color:#ffd3dc; font-size:13.5px; text-align:center; box-shadow:0 8px 22px rgba(0,0,0,.35); }
+  html[data-theme="dark"] .phone.gl.cr { --ring-in:#1A2540; --ok:#3fd69a; --no:#ff7b95; }
+  html[data-theme="dark"] .pg-tabs { background:var(--cr-gloss), linear-gradient(150deg, rgba(40,54,88,.88), rgba(30,42,72,.82)); }
+  html[data-theme="dark"] .pg-card, html[data-theme="dark"] .pg-row { background:var(--cr-gloss), linear-gradient(150deg, rgba(40,54,88,.88), rgba(30,42,72,.82)); box-shadow:var(--cr-sh-sm), inset 0 1px 0 rgba(190,210,255,.22); }
+  html[data-theme="dark"] .pg-chips .c-ok, html[data-theme="dark"] .pg-row.p .pg-badge { color:#6FE0A8; } html[data-theme="dark"] .pg-chips .c-bad, html[data-theme="dark"] .pg-row.f .pg-badge { color:#FFB3C2; }
+  html[data-theme="dark"] .pg-warn { color:#FFB3C2; }
+  @media (prefers-reduced-motion:reduce) { .pg-row, .pg-tabs button { transition:none; } }
+  .mg-row .mg-btn { flex:none; white-space:nowrap; }
+
+
+  /* ===== Нүүр хуудас (загвар 08): уулын зурагтай, шилэн хайрцагтай ===== */
+  body:has(.phone.h8) { background:#8fb2de !important; }
+  .phone.h8 { --ink:#14264f; --dim:#4c5f8c; position:relative; min-height:100vh; min-height:100dvh; padding:calc(12px + env(safe-area-inset-top)) 16px calc(18px + env(safe-area-inset-bottom)); gap:12px;
+    background:linear-gradient(180deg,#0049c8 0,#0049c8 120px,#3a3d42 100%); isolation:isolate; color:var(--ink); overflow:hidden; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif; }
+  .phone.h8::before { content:''; position:absolute; left:0; right:0; top:-125px; z-index:-1; aspect-ratio:841/1870; background:url(img/home/bg.jpg) center/100% 100% no-repeat; -webkit-mask-image:linear-gradient(#000 82%,transparent 100%); mask-image:linear-gradient(#000 82%,transparent 100%); pointer-events:none; }
+  html[data-theme="dark"] .phone.h8::before { filter:brightness(.5) saturate(.9); }
+  /* бусад цэс: нүүр хуудасны зураг ард нь бүдэг бүрзгэр */
+  html:has(.phone.gl), html:has(.phone.au) { background:#9bbbe0 !important; } body:has(.phone.gl), body:has(.phone.au) { background:transparent !important; }
+  body:has(.phone.gl)::before, body:has(.phone.au)::before { content:''; position:fixed; inset:-30px; z-index:-2; background:url(img/home/bg.jpg) center/cover no-repeat; filter:blur(11px); pointer-events:none; }
+  body:has(.phone.gl)::after, body:has(.phone.au)::after { content:''; position:fixed; inset:0; z-index:-1; background:linear-gradient(180deg, rgba(240,246,255,.22), rgba(246,248,252,.36)); pointer-events:none; }
+  .phone.gl, .phone.au { background:transparent !important; }
+  html[data-theme="dark"] body:has(.phone.gl)::before, html[data-theme="dark"] body:has(.phone.au)::before { filter:blur(16px) brightness(.45); }
+  html[data-theme="dark"] body:has(.phone.gl)::after, html[data-theme="dark"] body:has(.phone.au)::after { background:rgba(10,16,36,.45); }
+  .h8-head { display:flex; align-items:center; gap:10px; }
+  .h8-logo { flex:1; display:flex; justify-content:center; background:linear-gradient(145deg, rgba(255,255,255,.72), rgba(255,255,255,.42)); border:1px solid rgba(255,255,255,.9); border-radius:24px; padding:9px 14px; box-shadow:0 6px 20px rgba(30,60,120,.22); }
+  .h8-logo img { height:44px; width:auto; max-width:100%; display:block; }
+  .phone.h8 .thm { position:static; flex:none; width:46px; height:46px; border-radius:50%; background:linear-gradient(145deg, rgba(255,255,255,.8), rgba(255,255,255,.5)); border:1px solid #fff; color:#e8a400; box-shadow:0 6px 18px rgba(30,60,120,.25); }
+  .phone.h8 .thm svg { width:24px; height:24px; }
+  .h8-scene { flex:1; min-height:150px; position:relative; }
+  .h8-cattle { position:absolute; left:4%; top:2%; height:68%; max-height:210px; width:auto; filter:drop-shadow(0 6px 10px rgba(0,0,0,.3)); }
+  .h8-light { position:absolute; right:3%; top:0; height:70%; max-height:190px; width:auto; filter:drop-shadow(0 6px 8px rgba(0,0,0,.3)); }
+  .h8-cats { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  .h8-cat { position:relative; display:flex; flex-direction:column; align-items:center; text-align:center; background:linear-gradient(150deg, rgba(255,255,255,.8), rgba(255,255,255,.55)); border:1px solid rgba(255,255,255,.85); border-radius:26px; padding:14px 8px 14px; box-shadow:0 10px 28px rgba(30,60,120,.25), inset 0 1px 0 rgba(255,255,255,.9); color:var(--ink); text-decoration:none; }
+  .h8-car { position:relative; display:block; margin-bottom:8px; filter:drop-shadow(0 5px 6px rgba(0,0,0,.28)); }
+  .h8-car.sedan { width:114px; aspect-ratio:560/412; } .h8-car.bustruck { width:100%; max-width:172px; aspect-ratio:640/264; margin-top:8px; margin-bottom:16px; }
+  .h8-car img { display:block; width:100%; height:100%; }
+  .h8-car .bl { position:absolute; transform:translate(-50%,-50%); border-radius:50%; pointer-events:none; mix-blend-mode:screen;
+    background:radial-gradient(ellipse at center, #fff6cf 0%, #ffc02e 28%, rgba(255,150,0,.85) 52%, rgba(255,140,0,0) 78%); animation:h8blink 1s steps(1,end) infinite; }
+  @keyframes h8blink { 0% { opacity:1; } 50% { opacity:0; } 100% { opacity:1; } }
+  @media (prefers-reduced-motion:reduce) { .h8-car .bl { animation:none; opacity:.9; } }
+  .h8-cat b { font-size:17px; line-height:1.2; font-weight:800; } .h8-cat small { display:block; margin-top:5px; font-size:12px; color:#3d4f7c; font-weight:600; }
+  .h8-cat.soon { opacity:.6; }
+  .h8-rows { display:flex; flex-direction:column; gap:9px; }
+  .h8-row { display:flex; align-items:center; gap:14px; background:linear-gradient(150deg, rgba(255,255,255,.8), rgba(255,255,255,.55)); border:1px solid rgba(255,255,255,.85); border-radius:20px; padding:11px 16px; box-shadow:0 6px 18px rgba(30,60,120,.2), inset 0 1px 0 rgba(255,255,255,.9); color:var(--ink); text-decoration:none; font-weight:700; font-size:17px; }
+  .h8-row i { flex:none; width:38px; height:38px; display:grid; place-items:center; } .h8-row i svg { width:34px; height:34px; }
+  .h8-row span { flex:1; } .h8-row span small { background:#ffb300; color:#2a1d00; border-radius:20px; padding:1px 8px; font-size:12px; margin-left:6px; }
+  .h8-row em { font-style:normal; font-size:30px; color:#3d4f7c; line-height:.8; font-weight:400; }
+  .phone.h8 .mg-row { display:flex; justify-content:center; margin:4px 0 0; }
+  .phone.h8 .mg-btn { display:flex; align-items:center; justify-content:center; gap:12px; width:78%; margin:0; padding:14px 22px; border-radius:99px; border:1px solid rgba(160,190,255,.7); background:linear-gradient(150deg, #2f5fd0, #1b3a8f); color:#fff; font-size:19px; font-weight:800; box-shadow:0 10px 26px rgba(20,50,140,.45), inset 0 1px 0 rgba(255,255,255,.35); }
+  .phone.h8 .mg-btn i { width:34px; height:24px; display:block; } .phone.h8 .mg-btn i svg { width:100%; height:100%; }
+  .phone.h8 .mg-btn.on { background:linear-gradient(150deg, #ffcc33, #ff9d00); color:#2a1d00; border-color:#fff; }
+  /* шөнө горим */
+  html[data-theme="dark"] .phone.h8 { background:linear-gradient(180deg,#00264f 0,#00264f 120px,#1b1d22 100%); --ink:#EAF0FF; --dim:#B8C5E0; }
+  html[data-theme="dark"] .h8-logo, html[data-theme="dark"] .h8-cat, html[data-theme="dark"] .h8-row { background:linear-gradient(150deg, rgba(40,54,92,.82), rgba(26,36,66,.74)); border-color:rgba(190,210,255,.28); box-shadow:0 8px 22px rgba(0,0,0,.4), inset 0 1px 0 rgba(190,210,255,.22); }
+  html[data-theme="dark"] .h8-logo img { filter:brightness(0) invert(1); opacity:.92; }
+  html[data-theme="dark"] .h8-row i svg [fill="#1d2748"] { fill:#dfe8ff; } html[data-theme="dark"] .h8-row i svg [stroke="#1d2748"] { stroke:#dfe8ff; }
+  html[data-theme="dark"] .h8-row em { color:#9fb0d8; }
+  html[data-theme="dark"] .phone.h8 .thm { background:linear-gradient(145deg, rgba(60,78,122,.9), rgba(35,47,75,.9)); color:#FFD76A; border-color:rgba(190,210,255,.3); }
+</style>
+<style>/* iOS-fullscreen-fix: Home Screen апп дээр 100dvh дэлгэцийн ёроол хүрэхгүй тул fixed болгоно */
+  .phone.fixed { position:fixed; top:0; left:0; right:0; bottom:0; height:auto; min-height:0; margin:0 auto; }
+  .phone.fixed .bar { padding-bottom:max(10px, calc(env(safe-area-inset-bottom) - 12px)); }
+</style>
+
+<script src="offline.js"></script>
+</head>
+<body>
+<div id="app"></div>
+<script src="js/tests-data.js"></script>
+<script src="js/tests-art3d.js"></script>
+<script src="js/tests-art.js"></script>
+<script src="js/tests-lamps.js"></script>
+<script src="js/tests-photo.js"></script>
+<script src="signs-svg/index.js"></script>
+<script src="js/signs-data.js"></script>
+<script src="js/signs-draw.js"></script>
+<script src="js/signs-draw2.js"></script>
+<script src="js/tests-sign.js"></script>
+<script src="js/dialog.js"></script>
+<script src="js/nav.js"></script>
+<script src="js/progress.js"></script>
+<script>
+'use strict';
+const app = document.getElementById('app');
+const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;');
+let chap = TEST_CHAPTERS[0];
+const BMK = 'zam-test-bm-v1';
+const bm = () => { try { return JSON.parse(localStorage.getItem(BMK)) || {}; } catch (e) { return {}; } };
+const NOTES = {
+  q01: 'А = нэг эгнээ, Б = баруун зорчих хэсэг, В = хоёр зорчих хэсэг + тусгаарлах зурвас, Г = замын хил (явган хүний замын гадна ирмэг), Д = барилгын шугам. Эх зураг дээрх сумны хэмжээг тооцоолж хийсэн — баталгаажуулна уу.',
+  q05: 'В зургийн анхааруулах тэмдэг (хажуугийн зам нийлнэ) манай каталогт байхгүй — эх зурагтай адил дүрсээр зурсан, дугааргүй.',
+  q16: 'Эх зургийн эсрэг урсгал харагдахгүй байсан. «Гүйцэх үйлдэл» (эсрэг эгнээнд ГАРАХГҮЙ) гэсэн хариултад таарахаар нэг чиглэлийн зэргэлдээ эгнээгээр тракторыг гүйцэхээр зурсан.',
+  q18: 'Эх зурагт уулзварын байрлал ойлгомжгүй байсан. «Үгүй» хариулттай нийцүүлж: суудлын машин «Зам тавьж өг» (3.4) тэмдэгтэй замаас гол замын (3.1) ачааны машины өмнө орсон байдлаар зурсан. Ахаар заавал баталгаажуулна уу.',
+};
+const NOTES2 = {
+  q18: 'Зураг дээрх микроавтобусны суудлын тоог (жолоочоос гадна 14) харж баталгаажуулах боломжгүй. Асуултад 14 гэж заасан тул хариулт зөв.',
+};
+const key = q => 'q' + String(q.n).padStart(2, '0');
+const NOTE = q => NOTES[key(q)] && chap.id === 'ch01' ? NOTES[key(q)] : (chap.id === 'ch02' && NOTES2[key(q)]) || '';
+function artHtml(q) { if (q.art && typeof TEST_PHOTO !== 'undefined' && TEST_PHOTO[q.art]) return photoArt(TEST_PHOTO[q.art]); const f = (typeof TEST_ART3D !== 'undefined' && TEST_ART3D[q.art]) || (typeof TEST_ART !== 'undefined' && TEST_ART[q.art]); if (q.sg) return TSIGN.html(q); return q.art && f ? f() : ''; }
+
+// асуулт нэг дэлгэцэнд багтахгүй бол зургийг багасгана (хариу, тайлбар доош нь гүйлгэхгүй харагдана)
+function fitCard(c) {
+  const art = c.querySelector('.art'), why = c.querySelector('.why');
+  c.classList.remove('tight', 'tighter');
+  if (art) { art.style.maxHeight = ''; art.querySelectorAll('svg,canvas').forEach(e => e.style.maxHeight = ''); }
+  const ov = () => c.scrollHeight - c.clientHeight;
+  if (ov() > 2 && art) {
+    const nh = Math.max(64, art.offsetHeight - ov() - 4);
+    art.style.maxHeight = nh + 'px'; art.querySelectorAll('svg,canvas').forEach(e => e.style.maxHeight = nh + 'px');
+  }
+  if (ov() > 2) c.classList.add('tight');
+  if (ov() > 2) c.classList.add('tighter');
+}
+// зураг дээр дарахад бүтэн дэлгэцээр нээгдэж, хоёр хуруугаар томруулж, нэг хуруугаар зөөнө (давхар товшвол ойртоно)
+let LB = null;
+function closeLB(fromPop) {
+  if (!LB) return; const ov = LB; LB = null; ov.remove();
+  if (!fromPop && history.state && history.state.lb) history.back();
+}
+function openLB(src) {
+  if (LB) return;
+  const ov = document.createElement('div'); ov.className = 'lb';
+  ov.innerHTML = '<button class="lbx" aria-label="Хаах">✕</button><div class="lbc"></div>';
+  const c = ov.querySelector('.lbc'); c.innerHTML = src.innerHTML;
+  c.querySelectorAll('svg,canvas').forEach(e => { e.style.maxHeight = 'none'; e.style.width = '100%'; e.style.height = 'auto'; });
+  document.body.appendChild(ov); TSIGN.paint(c); LB = ov;
+  NAV.push({ lb: 1 });
+  ov.querySelector('.lbx').onclick = () => closeLB(false);
+  let s = 1, tx = 0, ty = 0; const ptr = new Map(); let d0 = 0, s0 = 1, lastTap = 0;
+  const apply = () => {
+    const W = innerWidth, H = innerHeight, ch = c.offsetHeight;
+    const bx = Math.max(0, (s * W - W) / 2), by = Math.max(0, (s * ch - H) / 2);
+    tx = Math.max(-bx, Math.min(bx, tx)); ty = Math.max(-by, Math.min(by, ty));
+    c.style.transform = `translate(${tx}px,${ty}px) scale(${s})`;
+  };
+  const zoomAt = (ns, px, py) => {
+    ns = Math.max(1, Math.min(2, ns)); const cx = innerWidth / 2, cy = innerHeight / 2;
+    const ax = (px - cx - tx) / s, ay = (py - cy - ty) / s; s = ns; tx = px - cx - ax * s; ty = py - cy - ay * s; apply();
+  };
+  ov.addEventListener('pointerdown', e => {
+    if (e.target.closest('.lbx')) return; ov.setPointerCapture(e.pointerId); ptr.set(e.pointerId, { x: e.clientX, y: e.clientY, sx: e.clientX, sy: e.clientY });
+    if (ptr.size === 2) { const [a, b] = [...ptr.values()]; d0 = Math.hypot(a.x - b.x, a.y - b.y) || 1; s0 = s; }
+  });
+  ov.addEventListener('pointermove', e => {
+    const p = ptr.get(e.pointerId); if (!p) return;
+    if (ptr.size === 2) {
+      p.x = e.clientX; p.y = e.clientY; const [a, b] = [...ptr.values()];
+      zoomAt(s0 * Math.hypot(a.x - b.x, a.y - b.y) / d0, (a.x + b.x) / 2, (a.y + b.y) / 2);
+    } else { tx += e.clientX - p.x; ty += e.clientY - p.y; p.x = e.clientX; p.y = e.clientY; apply(); }
+  });
+  const up = e => {
+    const p = ptr.get(e.pointerId); ptr.delete(e.pointerId); if (!p) return;
+    if (Math.hypot(e.clientX - p.sx, e.clientY - p.sy) < 8 && ptr.size === 0) {
+      const now = Date.now(); if (now - lastTap < 320) { lastTap = 0; if (s > 1.2) { s = 1; tx = ty = 0; apply(); } else zoomAt(1.8, e.clientX, e.clientY); } else lastTap = now;
+    }
+  };
+  ov.addEventListener('pointerup', up); ov.addEventListener('pointercancel', up);
+  ov.addEventListener('wheel', e => { e.preventDefault(); zoomAt(s * (e.deltaY < 0 ? 1.2 : 1 / 1.2), e.clientX, e.clientY); }, { passive: false });
+}
+window.addEventListener('popstate', () => closeLB(true));
+document.addEventListener('click', e => { const a = e.target.closest('.track .art'); if (a && !LB && a.dataset.done) openLB(a); });
+
+const CH_COLS = ['#4cc9f0', '#7bd88f', '#f783ac', '#b197fc', '#38d9a9', '#74c0fc', '#da77f2'];
+function practice() {
+  const hm = /^#(?:[cx]\d+)?q(\d+)$/.exec(location.hash), N = chap.questions.length, ans = {};
+  const start = hm ? Math.max(0, Math.min(N - 1, +hm[1] - 1)) : 0;
+  const card = (q, i) => {
+    const saved = bm()[chap.id + key(q)], hasArt = !!(q.art || q.sg);
+    return `<section class="qc" data-i="${i}" id="q${i}"><div class="qn"><span>${i + 1}</span><button class="bm${saved ? ' on' : ''}" data-i="${i}" title="Багшаас асуух (ойлгоогүй асуултаа тэмдэглэ)" aria-label="Багшаас асуух">❓</button></div>
+      ${hasArt ? `<div class="art artbox" data-i="${i}"></div>` : ''}<div class="q">${esc(q.q)}</div>
+      ${q.opts.map((o, k) => `<button class="opt" data-i="${i}" data-k="${k}"><span class="n">${k + 1}</span><span class="t">${esc(o)}</span><span class="m"></span></button>`).join('')}
+      <div class="whyslot"></div></section>`;
+  };
+  app.innerHTML = `<div class="phone fixed au" style="--ch:${CH_COLS[(chap.no - 1) % CH_COLS.length]}"><div class="hd"><div class="top"><a class="back" href="#cat${chap.cat || 'B'}" title="Бүлгүүд">←</a><h1>${esc(chap.name)}</h1><div class="cnt" id="cnt">${start + 1}/${N}</div></div><div class="prog"><i id="pg" style="width:${(start + 1) / N * 100}%"></i></div></div>
+    <div class="track" id="track">${chap.questions.map(card).join('')}</div>
+    <div class="bar"><button class="pv" id="pv" title="Өмнөх">‹</button><span class="pc" id="pc"></span><button class="nx" id="nx">ДАРААХ ›</button></div></div>`;
+  const track = document.getElementById('track');
+  const cards = [...app.querySelectorAll('.qc')];
+  const fill = box => { if (box.dataset.done) return; box.dataset.done = 1; box.classList.remove('artbox'); box.innerHTML = artHtml(chap.questions[+box.dataset.i]); TSIGN.paint(box); };
+  const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { fill(e.target); io.unobserve(e.target); } }), { root: track, rootMargin: '0px 1800px' });
+  app.querySelectorAll('.art').forEach(b => io.observe(b));
+  app.onclick = e => {
+    const o = e.target.closest('.opt'), s = e.target.closest('.bm');
+    if (s) { const q = chap.questions[+s.dataset.i], b = bm(), k = chap.id + key(q); b[k] = !b[k]; localStorage.setItem(BMK, JSON.stringify(b)); s.classList.toggle('on', !!b[k]); return; }
+    if (!o) return;
+    const i = +o.dataset.i, k = +o.dataset.k, q = chap.questions[i];
+    if (ans[i] === 'done' || o.disabled) return;
+    const m = o.querySelector('.m');
+    ans[i] = 'done';
+    const opts = cards[i].querySelectorAll('.opt'); opts.forEach(el => { el.disabled = true; });
+    if (k === q.a) { o.classList.add('ok'); m.textContent = '✓'; }
+    else { o.classList.add('bad'); m.textContent = '🚫'; const g = opts[q.a]; g.classList.add('ok'); g.querySelector('.m').textContent = '✓'; }   // буруу дарвал зөв хариу автоматаар ногоороор сонгогдоно
+    if (q.why) cards[i].querySelector('.whyslot').innerHTML = `<div class="why"><b>Тайлбар:</b>${esc(q.why)}</div>`;
+    fitCard(cards[i]);
+  };
+  let cur = -1, raf = 0;
+  const upd = () => {
+    raf = 0; const w = track.clientWidth || 1, best = Math.max(0, Math.min(N - 1, Math.round(track.scrollLeft / w)));
+    if (best !== cur) { cur = best; document.getElementById('cnt').textContent = (best + 1) + '/' + N; document.getElementById('pg').style.width = (best + 1) / N * 100 + '%'; document.getElementById('pv').disabled = best === 0; document.getElementById('nx').disabled = best === N - 1; document.getElementById('pc').textContent = (best + 1) + '/' + N; }
+  };
+  track.onscroll = () => { if (!raf) raf = requestAnimationFrame(upd); };
+  const goTo = i => track.scrollTo({ left: i * track.clientWidth, behavior: 'smooth' });
+  document.getElementById('pv').onclick = () => goTo(Math.max(0, cur - 1));
+  document.getElementById('nx').onclick = () => goTo(Math.min(N - 1, cur + 1));
+  document.onkeydown = e => { if (e.key === 'ArrowRight') goTo(Math.min(N - 1, cur + 1)); else if (e.key === 'ArrowLeft') goTo(Math.max(0, cur - 1)); };
+  track.style.scrollBehavior = 'auto'; track.scrollLeft = start * track.clientWidth; setTimeout(() => { track.scrollLeft = start * track.clientWidth; upd(); }, 120);
+}
+
+/* ---- Шалгалтын тест: бүх сангаас 20 санамсаргүй асуулт, 20 минут, дүн нь бүгдийг хариулсны дараа ---- */
+const EXAM_N = 20, EXAM_MIN = 20, EXAM_FAIL = 3; /* EXAM_FAIL алдаа (хариулаагүйг оруулаад) хийвэл унана */
+let EX = null;
+/* Шалгалтын үед буцах (дэлгэцийн ← болон гар утасны/хөтчийн Back) шууд гарахгүй, эхлээд асууна. */
+let ignorePop = false;
+const examLeaveAsk = () => CrystalDialog.confirm({ id: 'examLeave', type: 'warning', title: 'Шалгалтаас гарах уу?', text: 'Шалгалт дуусаагүй байна. Одоо гарвал энэ оролдлогын явц хадгалагдахгүй.', cancel: 'Шалгалтаа үргэлжлүүлэх', ok: 'Шалгалтаас гарах' });
+/* Шалгалтыг орхих: оролдлого хадгалагдахгүй (examResult дуудагдахгүй), ангиллын цэс рүү түүхийг цэвэрлэн буцна. */
+const examLeaveNow = () => { if (!EX || EX.done) return; clearInterval(EX.timer); EX.guard = false; EX.done = true; NAV.up('#cat' + EX.cat); };
+window.addEventListener('popstate', e => {
+  if (e.cdHandled) return;                              // CrystalDialog Back-ийг өөрөө боловсруулсан
+  if (ignorePop) { ignorePop = false; return; }
+  if (!EX || !EX.guard || EX.done || (e.state && (e.state.exg || e.state.lb))) return;
+  NAV.push({ exg: 1 });                                 // хамгаалалтын түүхийн оруулгыг эхлээд сэргээнэ (цонх нээлттэй үед Back = цуцлах)
+  examLeaveAsk().then(ok => { if (ok) examLeaveNow(); });
+});
+const mmss = ms => { const s = Math.max(0, Math.round(ms / 1000)); return String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0'); };
+/* Ангилал бүрийн шалгалт тусдаа: тухайн ангилалын асуултаас сонгоно. Тохиргоог CATS[].exam = {n, min, fail}-аар ангилал бүрд өөрчилнө. */
+const examCfg = cat => Object.assign({ n: EXAM_N, min: EXAM_MIN, fail: EXAM_FAIL }, (CATS.find(x => x.id === cat) || {}).exam || {});
+function examNew(cat) {
+  const cf = examCfg(cat), all = []; TEST_CHAPTERS.filter(c => c.cat === cat).forEach(c => c.questions.forEach(q => all.push(q)));
+  for (let i = all.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [all[i], all[j]] = [all[j], all[i]]; }
+  EX = { cat, cf, qs: all.slice(0, cf.n), ans: [], end: Date.now() + cf.min * 60000, done: false, timer: 0, used: 0 };
+}
+function exam(cat) { examNew(cat); examTrack('take'); }
+function examTrack(mode) {
+  const rv = mode === 'review', qs = EX.qs, N = qs.length, ans = EX.ans;
+  const card = (q, i) => `<section class="qc" data-i="${i}"><div class="qn"><span>${i + 1}</span>${rv && ans[i] === undefined ? '<em class="skip">Хариулаагүй</em>' : ''}</div>
+    ${q.art || q.sg ? `<div class="art artbox" data-i="${i}"></div>` : ''}<div class="q">${esc(q.q)}</div>
+    ${q.opts.map((o, k) => { let cls = '', m = ''; if (rv) { if (k === q.a) { cls = ' ok'; m = '✓'; } else if (k === ans[i]) { cls = ' bad'; m = '🚫'; } } else if (ans[i] === k) cls = ' sel';
+      return `<button class="opt${cls}" data-i="${i}" data-k="${k}" ${rv ? 'disabled' : ''}><span class="n">${k + 1}</span><span class="t">${esc(o)}</span><span class="m">${m}</span></button>`; }).join('')}
+    ${rv && q.why ? `<div class="why"><b>Тайлбар:</b>${esc(q.why)}</div>` : ''}</section>`;
+  app.innerHTML = `<div class="phone fixed exam au" style="--ch:#4cc9f0"><div class="hd"><div class="top"><a class="back" href="#cat${EX.cat}" title="Ангилал">←</a><h1>${rv ? 'Хариу' : 'Шалгалт'}</h1><div class="cnt" id="tm">${rv ? '1/' + N : mmss(EX.end - Date.now())}</div></div><div class="prog"><i id="pg" style="width:0"></i></div></div>
+    <div class="track" id="track">${qs.map(card).join('')}</div>
+    <div class="bar"><button class="pv" id="pv" title="Өмнөх">‹</button><span class="pc" id="pc"></span><button class="nx" id="nx">ДАРААХ ›</button></div></div>`;
+  const track = document.getElementById('track');
+  const fill = box => { if (box.dataset.done) return; box.dataset.done = 1; box.classList.remove('artbox'); box.innerHTML = artHtml(qs[+box.dataset.i]); TSIGN.paint(box); if (rv) setTimeout(() => fitCard(box.closest('.qc')), 60); };
+  const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { fill(e.target); io.unobserve(e.target); } }), { root: track, rootMargin: '0px 1800px' });
+  app.querySelectorAll('.art').forEach(b => io.observe(b));
+  let cur = 0;
+  const answered = () => ans.filter(a => a !== undefined).length;
+  const upd = () => {
+    const w = track.clientWidth || 1; cur = Math.max(0, Math.min(N - 1, Math.round(track.scrollLeft / w)));
+    document.getElementById('pc').textContent = (cur + 1) + '/' + N;
+    document.getElementById('pv').disabled = cur === 0;
+    document.getElementById('nx').textContent = cur === N - 1 ? (rv ? 'ДҮН' : 'ДУУСГАХ ✓') : 'ДАРААХ ›';
+    if (rv) { document.getElementById('tm').textContent = (cur + 1) + '/' + N; document.getElementById('pg').style.width = (cur + 1) / N * 100 + '%'; }
+    else document.getElementById('pg').style.width = answered() / N * 100 + '%';
+  };
+  let raf = 0; track.onscroll = () => { if (!raf) raf = requestAnimationFrame(() => { raf = 0; upd(); }); };
+  const goTo = i => track.scrollTo({ left: i * track.clientWidth, behavior: 'smooth' });
+  const finish = ask => {
+    if (EX.done) return;
+    if (ask) {
+      const left = N - answered();
+      if (left > 0) { CrystalDialog.confirm({ id: 'examFinish', type: 'info', title: 'Шалгалтыг дуусгах уу?', text: left + ' асуултад хариулаагүй байна. Шалгалтыг дуусгах уу?', cancel: 'Үргэлжлүүлэх', ok: 'Дуусгах' }).then(ok => { if (ok && !EX.done) finish(false); }); return; }
+    }
+    clearInterval(EX.timer); EX.done = true; EX.used = EX.cf.min * 60000 -Math.max(0, EX.end - Date.now()); examResult();
+  };
+  document.getElementById('pv').onclick = () => goTo(Math.max(0, cur - 1));
+  document.getElementById('nx').onclick = () => { if (cur < N - 1) goTo(cur + 1); else if (rv) examResult(); else finish(true); };
+  document.onkeydown = e => { if (e.key === 'ArrowRight') goTo(Math.min(N - 1, cur + 1)); else if (e.key === 'ArrowLeft') goTo(Math.max(0, cur - 1)); };
+  if (!rv) {
+    if (!EX.guard) { EX.guard = true; NAV.push({ exg: 1 }); }
+    const bk = app.querySelector('.back'); if (bk) bk.onclick = ev => { ev.preventDefault(); examLeaveAsk().then(ok => { if (ok) examLeaveNow(); }); };
+    app.onclick = e => {
+      const o = e.target.closest('.opt'); if (!o) return;
+      const i = +o.dataset.i, k = +o.dataset.k; ans[i] = k;
+      o.parentElement.querySelectorAll('.opt').forEach(el => el.classList.toggle('sel', +el.dataset.k === k)); upd();
+    };
+    clearInterval(EX.timer);
+    EX.timer = setInterval(() => {
+      const left = EX.end - Date.now(), tm = document.getElementById('tm');
+      if (!tm) { clearInterval(EX.timer); return; }
+      tm.textContent = mmss(left); tm.classList.toggle('warn', left <= 60000);
+      if (left <= 0) finish(false);
+    }, 500);
+  }
+  track.style.scrollBehavior = 'auto'; upd();
+}
+function examResult() {
+  const qs = EX.qs, N = qs.length, right = qs.filter((q, i) => EX.ans[i] === q.a).length, skipped = qs.filter((q, i) => EX.ans[i] === undefined).length;
+  CrystalDialog.dismiss();
+  app.onclick = null; document.onkeydown = null;
+  if (EX.guard) { EX.guard = false; ignorePop = true; history.back(); }   // шалгалтын хамгаалалтын түүхийн оруулгыг арилгана
+  const FAIL = EX.cf.fail, wrong = N - right, pass = wrong < FAIL;
+  if (!EX.saved) { EX.saved = true; PROG.save(EX, { right, skipped, pass }); }   /* «Миний ахиц»: нэг шалгалтын дүн нэг удаа */
+  app.innerHTML = `<div class="phone gl cr" style="--ch:#4cc9f0"><div class="top"><a class="back" href="#cat${EX.cat}" title="Ангилал">←</a><h1>Шалгалтын дүн</h1></div>
+    <div class="body"><div class="score ${pass ? 'pass' : 'fail'}"><div class="verdict">${pass ? '✓ ТЭНЦСЭН' : '✗ ТЭНЦЭЭГҮЙ'}</div><div class="big">${right}<small>/${N}</small></div><div class="pct">Зөв хариулт · ${Math.round(right / N * 100)}%</div>
+    <div class="vnote">${pass ? 'Алдаа ' + wrong + ' (' + FAIL + '-аас бага)' : 'Алдаа ' + wrong + ' — ' + FAIL + ' ба түүнээс дээш алдвал тэнцэхгүй'}</div>
+    <div class="meta">Алдсан: ${N - right - skipped} · Хариулаагүй: ${skipped} · Хугацаа: ${mmss(EX.used)}</div></div>
+    <button class="nx wide" id="rv">Хариуг харах</button><button class="pv2 wide" id="again">Дахин шалгалт өгөх</button><a class="pv2 wide" href="#chapters">Нүүр хуудас</a></div></div>`;
+  document.getElementById('rv').onclick = () => examTrack('review');
+  document.getElementById('again').onclick = () => { examNew(EX.cat); examTrack('take'); };
+}
+
+function review() {
+  const pics = chap.questions.filter(q => q.art || q.sg).length;
+  app.innerHTML = `<div class="rv"><h1>Шалгах хуудас — ${esc(chap.name)}</h1><a href="#chapters">← Бүлгүүд</a>
+    <p>${chap.questions.length} асуултаас ${pics} нь зурагтай. Зүүн талд эх апп, баруун талд шинэ зураг. Асуулт, хариулт, тайлбар ҮСЭГ БҮРЭЭР ХЭВЭЭР.</p>
+    ${chap.questions.map(q => `<div class="card"><h2>${q.n}. ${q.art || q.sg ? 'Зурагтай' : 'Зураггүй'}</h2>
+      ${q.art || q.sg ? `<div class="cols"><div><p class="cap">Эх (хуучин)</p><div class="crop"><img src="../source-rules/tests/${chap.id}/q${String(q.n).padStart(2, '0')}.jpg" alt=""></div></div>
+      <div><p class="cap">Шинэ</p><div class="art" style="margin:0">${artHtml(q)}</div></div></div>` : ''}
+      <div class="rq">${esc(q.q)}</div><ol>${q.opts.map((o, k) => `<li class="${k === q.a ? 'ok' : ''}">${esc(o)}${k === q.a ? ' ✓' : ''}</li>`).join('')}</ol>
+      ${q.why ? `<div class="why"><b>Тайлбар:</b>${esc(q.why)}</div>` : ''}
+      ${NOTE(q) ? `<div class="note">⚠ ${esc(NOTE(q))}</div>` : ''}</div>`).join('')}</div>`;
+  TSIGN.paint(app);
+}
+/* Ангилал бүр тусдаа: өөрийн сэдвийн тест + өөрийн шалгалт. Шинэ ангилалын бүлгүүд tests-data.js-д cat:'C' гэх мэтээр орж асуулттай болмогц нүүрэнд автоматаар нээгдэнэ.
+   exam: {n, min, fail} — ангилалын шалгалтын асуултын тоо, минут, тэнцэхгүй алдааны тоо (өгөөгүй бол анхдагч 20/20/3). */
+/* C, D, E ангилал нэг дор (нэг сан, нэг шалгалт) — tests-data.js-д cat:'C' гэж оруулна. */
+const CATS = [{ id: 'B', label: 'B', name: 'B ангилал', of: 24 }, { id: 'C', label: 'C, D, E', name: 'C, D, E ангилал', of: 13, exam: { n: 10, min: 10, fail: 2 } }];
+const catQ = id => TEST_CHAPTERS.filter(c => c.cat === id).reduce((s, c) => s + c.questions.length, 0);
+/* ---- «Багшаас асуух»: дадлагын асуулт бүр дээр ❓ дарж тэмдэглэсэн (ойлгоогүй) асуултууд энд цугларна. «✓ Ойлголоо» дарвал жагсаалтаас гарна. ---- */
+const askItems = () => { const b = bm(), out = []; TEST_CHAPTERS.forEach(c => c.questions.forEach(q => { if (b[c.id + key(q)]) out.push({ c, q }); })); return out; };
+function askList() {
+  const items = askItems();
+  const card = ({ c, q }, n) => `<div class="ask" data-k="${c.id}${key(q)}"><div class="ask-h"><span class="ask-no">${c.no}-р бүлэг · ${q.n}</span><span class="ask-ch">${esc(c.name)}</span></div>
+    ${q.art || q.sg ? `<div class="art" data-n="${n}"></div>` : ''}<div class="rq">${esc(q.q)}</div>
+    <ol>${q.opts.map((o, k) => `<li class="${k === q.a ? 'ok' : ''}">${esc(o)}${k === q.a ? ' ✓' : ''}</li>`).join('')}</ol>
+    ${q.why ? `<div class="why"><b>Тайлбар:</b>${esc(q.why)}</div>` : ''}<button class="nx wide ask-done">✓ Ойлголоо</button></div>`;
+  app.innerHTML = `<div class="phone gl cr"><div class="top"><a class="back" href="#chapters" title="Нүүр">←</a><h1>Багшаас асуух</h1><div class="cnt" id="askc">${items.length}</div></div><div class="body" style="padding:6px 0 28px" id="askb">
+    ${items.length ? items.map(card).join('') : '<div class="ask-empty"><div style="font-size:46px">🙋</div><b>Одоохондоо хоосон</b><p>Дадлагын (сэдвийн) тестэд ойлгоогүй асуулт дээрээ ❓ дарвал энд хадгалагдана.</p></div>'}</div></div>`;
+  items.forEach(({ q }, n) => { const box = app.querySelector('.art[data-n="' + n + '"]'); if (box) box.innerHTML = artHtml(q); });
+  TSIGN.paint(app);
+  app.onclick = e => {
+    const d = e.target.closest('.ask-done'); if (!d) return; const card = d.closest('.ask'), b = bm(); delete b[card.dataset.k]; localStorage.setItem(BMK, JSON.stringify(b));
+    card.style.transition = 'opacity .25s, transform .25s'; card.style.opacity = 0; card.style.transform = 'scale(.96)'; setTimeout(() => { card.remove(); const n = askItems().length; document.getElementById('askc').textContent = n; if (!n) askList(); }, 260);
+  };
+}
+function chapters() {
+  const IC = {
+    sign: '<svg viewBox="0 0 40 40"><polygon points="20,4 37,34 3,34" fill="#fff" stroke="#e23b31" stroke-width="4.5" stroke-linejoin="round"/><rect x="18.3" y="14" width="3.4" height="11" rx="1.7" fill="#1d2748"/><circle cx="20" cy="29" r="2" fill="#1d2748"/></svg>',
+    ask: '<svg viewBox="0 0 40 40" fill="none" stroke="#1d2748" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="17" cy="14" r="6" fill="#1d2748"/><path d="M5 34c1-8 6-11 12-11s11 3 12 11z" fill="#1d2748"/><path d="M27.5 8.5a4.3 4.3 0 118 2c-1.4 1.4-3.5 2-3.5 4.3" stroke="#2f9a62"/><circle cx="32" cy="19.5" r="1.3" fill="#2f9a62" stroke="none"/></svg>',
+    prog: '<svg viewBox="0 0 40 40"><rect x="6" y="24" width="6" height="10" rx="1.4" fill="#4caf50"/><rect x="15" y="17" width="6" height="17" rx="1.4" fill="#2e9e55"/><rect x="24" y="10" width="6" height="24" rx="1.4" fill="#178a47"/><path d="M5 14l8-5 7 3 10-8" fill="none" stroke="#1d2748" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M31 3h7v6h-7z" fill="#1d2748"/></svg>',
+    game: '<svg viewBox="0 0 40 28" fill="#fff"><path d="M9 3h22c4 0 7 3 8 8l1.5 9c.5 3-1 5.5-4 5.5-2 0-3.2-.9-4.6-2.6L29 19H11l-3 3.9c-1.4 1.7-2.6 2.6-4.6 2.6-3 0-4.5-2.5-4-5.5L1 11C2 6 5 3 9 3z"/><rect x="9.5" y="9" width="2.6" height="7" rx="1.2" fill="#1c3f9e"/><rect x="7.3" y="11.2" width="7" height="2.6" rx="1.2" fill="#1c3f9e"/><circle cx="29" cy="10" r="1.8" fill="#1c3f9e"/><circle cx="25" cy="13.5" r="1.8" fill="#1c3f9e"/></svg>'
+  };
+  /* Машины: урд талын дохио (мигалка) нь жинхэнэ гэрлийн байрлал дээр (зургийн %-аар) анивчина */
+  const LAMPS = { sedan: [[9.8, 52.2, 10.7, 5.3], [90.2, 52.2, 10.7, 5.3]], bustruck: [[37.5, 74.2, 6.4, 7], [55.9, 74.2, 6.4, 7], [79.7, 76.1, 6.4, 7], [96.9, 75.8, 6.4, 7]] };
+  const car = n => `<span class="h8-car ${n}"><img src="img/home/${n}.webp" alt=""></span>`;
+  const cats = CATS.map(k => { const qn = catQ(k.id), n = TEST_CHAPTERS.filter(c => c.cat === k.id && c.questions.length).length;
+    const img = k.id === 'B' ? 'sedan' : 'bustruck', title = k.id === 'B' ? 'B ангиллын<br>тест' : 'C, D, E<br>ангиллын тест';
+    return qn ? `<a class="h8-cat" href="#cat${k.id}">${car(img)}<b>${title}</b><small>${n} бүлэг · ${qn} асуулт</small></a>`
+      : `<div class="h8-cat soon">${car(img)}<b>${title}</b><small>Удахгүй</small></div>`; }).join('');
+  const ask = askItems().length;
+  app.innerHTML = `<div class="phone h8"><div class="h8-head"><div class="h8-logo"><img src="img/home/logo.png" alt="Завхан Отгон Жолоо"></div>
+      <button class="thm" type="button" aria-label="Өдөр / Шөнө горим солих"><svg class="sn" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.8v2.4M12 18.8v2.4M2.8 12h2.4M18.8 12h2.4M5.5 5.5l1.7 1.7M16.8 16.8l1.7 1.7M5.5 18.5l1.7-1.7M16.8 7.2l1.7-1.7"/></svg><svg class="mn" viewBox="0 0 24 24" fill="currentColor"><path d="M20.5 14.6A8.6 8.6 0 019.4 3.5a8.6 8.6 0 1011.1 11.1z"/></svg></button></div>
+    <div class="h8-scene"></div>
+    <div class="h8-cats">${cats}</div>
+    <div class="h8-rows">
+      <a class="h8-row" href="signs.html"><i>${IC.sign}</i><span>Тэмдгийн толь</span><em>›</em></a>
+      <a class="h8-row" href="#ask"><i>${IC.ask}</i><span>Багшаас асуух${ask ? ' <small>' + ask + '</small>' : ''}</span><em>›</em></a>
+      <a class="h8-row" href="#progress"><i>${IC.prog}</i><span>Миний ахиц</span><em>›</em></a></div>
+    <div class="mg-row"><button class="mg-btn" id="mgbtn" type="button"><i>${IC.game}</i>Mini game</button></div></div>`;
+  const mb = document.getElementById('mgbtn'); mb.onclick = () => { if (document.getElementById('fcar')) stopMini(); else startMini(); }; if (sessionStorage.getItem('zam-mini') === '1') startMini(); warmCats();
+}
+/* ---- Mini game: цэс дээрх машин + тэмдгийн хөөс нь «🎮 Mini game» товчоор л гарна (анхнаасаа нуугдсан; сесс дотор сонголт хадгалагдана). ---- */
+const miniHtml = () => `<div class="fc-colors" id="fcol"><span>Машинаа сонго:</span>${[1, 2, 3, 4, 5, 6, 7, 8].map(n => `<i data-n="${n}"><img src="img/cars/c${n}.png" alt=""></i>`).join('')}</div><div class="fc" id="fcar" title="Намайг чир!"><img id="fcimg" src="img/cars/c1.png" alt="" draggable="false"></div>`;
+function startMini() {
+  const btn = document.getElementById('mgbtn'), ph = app.querySelector('.phone'); if (!btn || document.getElementById('fcar')) return;
+  (btn.closest('.mg-row') || btn).insertAdjacentHTML('afterend', miniHtml()); btn.classList.add('on'); sessionStorage.setItem('zam-mini', '1'); carFree();
+}
+function stopMini() {
+  const btn = document.getElementById('mgbtn'); if (btn) btn.classList.remove('on'); sessionStorage.setItem('zam-mini', '0');
+  app.querySelectorAll('#fcar,#fcol,.fc-sign,.fc-bubble,.fc-puff,.fc-ring,.fc-spark,.fc-score').forEach(e => e.remove());
+}
+
+/* ---- Цэс дээрх машин: хуруугаар барьж чирвэл дагаж явна (жолоо шиг эргэнэ, утаа гаргана). Товшвол дуугарч үг хэлнэ. Цэсийн товчийг хаахгүй: зөвхөн машин өөрөө хуруу хүлээн авна. ---- */
+const CAR_TALK = ['Би-ип! 🚗', 'Бүсээ зүү! 🔒', 'Тэмдгээ мэд! 🛑', 'Замаа тавь!', 'Хурдаа хэтрүүлэх хэрэггүй!', 'Яваад өгье! 😎', 'Явган хүнд зам тавь 🚶'];
+let _ac = null;
+function honk() {
+  try { _ac = _ac || new (window.AudioContext || window.webkitAudioContext)(); const t = _ac.currentTime;
+    [392, 494].forEach(f => { const o = _ac.createOscillator(), g = _ac.createGain(), fl = _ac.createBiquadFilter(); o.type = 'sawtooth'; o.frequency.value = f; fl.type = 'lowpass'; fl.frequency.value = 1100;
+      g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(.12, t + .02); g.gain.setValueAtTime(.12, t + .16); g.gain.linearRampToValueAtTime(0, t + .22); o.connect(fl); fl.connect(g); g.connect(_ac.destination); o.start(t); o.stop(t + .5); }); } catch (e) {}
+}
+function pop() {   // хөөс хагарах «пок»: богино шуугиан + буурах давтамж
+  try { _ac = _ac || new (window.AudioContext || window.webkitAudioContext)(); const t = _ac.currentTime, len = Math.floor(_ac.sampleRate * .09), buf = _ac.createBuffer(1, len, _ac.sampleRate), d = buf.getChannelData(0);
+    for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 3);
+    const s = _ac.createBufferSource(), bp = _ac.createBiquadFilter(), g = _ac.createGain(); s.buffer = buf; bp.type = 'bandpass'; bp.Q.value = 1.4; bp.frequency.setValueAtTime(2600, t); bp.frequency.exponentialRampToValueAtTime(700, t + .08);
+    g.gain.setValueAtTime(.55, t); g.gain.exponentialRampToValueAtTime(.001, t + .1); s.connect(bp); bp.connect(g); g.connect(_ac.destination); s.start(t);
+    const o = _ac.createOscillator(), og = _ac.createGain(); o.type = 'sine'; o.frequency.setValueAtTime(520, t); o.frequency.exponentialRampToValueAtTime(140, t + .07); og.gain.setValueAtTime(.2, t); og.gain.exponentialRampToValueAtTime(.001, t + .08); o.connect(og); og.connect(_ac.destination); o.start(t); o.stop(t + .1); } catch (e) {}
+}
+function coin(rare) {
+  try { _ac = _ac || new (window.AudioContext || window.webkitAudioContext)(); const t = _ac.currentTime, notes = rare ? [784, 988, 1318, 1568] : [880, 1318];
+    notes.forEach((fq, i) => { const o = _ac.createOscillator(), g = _ac.createGain(), s = t + i * .075; o.type = 'triangle'; o.frequency.value = fq; g.gain.setValueAtTime(0, s); g.gain.linearRampToValueAtTime(.16, s + .01); g.gain.exponentialRampToValueAtTime(.001, s + .22); o.connect(g); g.connect(_ac.destination); o.start(s); o.stop(s + .25); }); } catch (e) {}
+}
+function carFree() {
+  const car = document.getElementById('fcar'), phone = app.querySelector('.phone'); if (!car) return;
+  const W = 40, H = 87, pick = localStorage.getItem('zam-car-pick') || '1', img = document.getElementById('fcimg'); img.src = 'img/cars/c' + pick + '.png';
+  const dots = [...document.querySelectorAll('#fcol i')];
+  dots.forEach(d => { d.classList.toggle('on', d.dataset.n === pick); d.onclick = () => { localStorage.setItem('zam-car-pick', d.dataset.n); img.src = 'img/cars/c' + d.dataset.n + '.png'; dots.forEach(x => x.classList.toggle('on', x === d)); bounce(); }; });
+  const bounds = () => { const r = phone.getBoundingClientRect(); return { l: r.left + 4, r: r.right - W - 4, t: 4, b: window.innerHeight - H - 4 }; };
+  const saved = JSON.parse(localStorage.getItem('zam-car-pos') || 'null'), b0 = bounds();
+  let x = saved ? b0.l + saved.fx * (b0.r - b0.l) : b0.r - 10, y = saved ? saved.fy * b0.b : b0.b - 10, tx = x, ty = y, rot = 0, drag = false, moved = 0, lastPuff = 0, raf = 0, ox = 0, oy = 0;
+  const clamp = (v, a, z) => Math.max(a, Math.min(z, v));
+  const draw = () => { car.style.transform = `translate(${x}px,${y}px) rotate(${rot}deg)`; };
+  const bubble = (txt, small) => { const e = document.createElement('div'); e.className = 'fc-bubble' + (small ? ' sm' : ''); e.textContent = txt; app.appendChild(e); const b = bounds(), w = small ? Math.min(230, txt.length * 6.4 + 24) : txt.length * 8 + 24;
+    e.style.left = clamp(x - w / 2 + W / 2, b.l, b.r + W - w) + 'px'; e.style.top = Math.max(6, y - 44) + 'px'; setTimeout(() => e.remove(), small ? 2600 : 1500); };
+  function bounce() { car.classList.remove('bounce'); void car.offsetWidth; car.classList.add('bounce'); }
+  const puff = (cx, cy, hx, hy) => { const p = document.createElement('div'); p.className = 'fc-puff'; p.style.left = (cx - hx * 42 + Math.random() * 10 - 5) + 'px'; p.style.top = (cy - hy * 42 + Math.random() * 10 - 5) + 'px'; p.style.setProperty('--dx', (Math.random() * 20 - 10) + 'px'); app.appendChild(p); setTimeout(() => p.remove(), 650); };
+  const tick = now => {
+    if (!document.body.contains(car)) return;
+    const dx = tx - x, dy = ty - y, dist = Math.hypot(dx, dy);
+    if (dist > 1.2) {
+      const step = Math.min(dist, Math.max(2, dist * .16)); x += dx / dist * step; y += dy / dist * step;
+      if (step > 3.5) { const want = Math.atan2(dy, dx) * 180 / Math.PI + 90; let d = ((want - rot + 540) % 360) - 180; rot += d * .22; }   // жолооны эргэлт: явж буй чиг рүүгээ аажим эргэнэ
+      if (step > 4 && now - lastPuff > 90) { lastPuff = now; const hx = Math.cos((rot - 90) * Math.PI / 180), hy = Math.sin((rot - 90) * Math.PI / 180); puff(x + W / 2, y + H / 2, hx, hy); }
+      draw();
+    }
+    collect();
+    raf = requestAnimationFrame(tick);
+  };
+  draw(); raf = requestAnimationFrame(tick);
+  car.addEventListener('pointerdown', e => { e.preventDefault(); try { car.setPointerCapture(e.pointerId); } catch (_) {} drag = true; moved = 0; ox = e.clientX - (x + W / 2); oy = e.clientY - (y + H / 2); car.classList.add('grab'); });
+  car.addEventListener('pointermove', e => { if (!drag) return; const b = bounds(); const nx = clamp(e.clientX - ox - W / 2, b.l, b.r), ny = clamp(e.clientY - oy - H / 2, b.t, b.b); moved += Math.hypot(nx - tx, ny - ty); tx = nx; ty = ny; });
+  const up = () => { if (!drag) return; drag = false; car.classList.remove('grab'); const b = bounds();
+    localStorage.setItem('zam-car-pos', JSON.stringify({ fx: (tx - b.l) / Math.max(1, b.r - b.l), fy: ty / Math.max(1, b.b) }));
+    if (moved < 8) { honk(); bounce(); bubble(CAR_TALK[Math.floor(Math.random() * CAR_TALK.length)]); } };
+  car.addEventListener('pointerup', up); car.addEventListener('pointercancel', up);
+  /* ---- Тэмдэг түүх: цэс дээр санамсаргүй газар тэмдэг гарч ирнэ, машинаараа гүйцвэл түүгдэнэ (зүгээр л хөгжилд). Тэмдэг хуруу хүлээн авахгүй тул цэсийн товч хаагдахгүй. ---- */
+  const pool = (typeof SIGNS !== 'undefined' ? SIGNS : []).filter(s => SG.has(s.code) && SG.isOfficial(s.code)), sigs = [], SZ = 66;
+  let count = +(localStorage.getItem('zam-signs-count') || 0), spawnT = 0;
+  const hero = app.querySelector('.hero'), badge = document.createElement('div'); badge.className = 'fc-score'; if (hero) hero.appendChild(badge);
+  const showCount = () => { badge.textContent = '🛑 ' + count; badge.classList.remove('pop'); void badge.offsetWidth; badge.classList.add('pop'); }; badge.textContent = '🛑 ' + count;
+  const ring = (cx, cy, rare) => { const e = document.createElement('div'); e.className = 'fc-ring' + (rare ? ' gold' : ''); e.style.left = cx + 'px'; e.style.top = cy + 'px'; app.appendChild(e); setTimeout(() => e.remove(), 480); };
+  const spark = (cx, cy, rare) => { for (let i = 0; i < (rare ? 14 : 8); i++) { const e = document.createElement('div'), a = Math.PI * 2 * i / (rare ? 14 : 8) + Math.random() * .4, d = 34 + Math.random() * 26; e.className = 'fc-spark' + (rare ? ' gold' : ''); e.style.left = cx + 'px'; e.style.top = cy + 'px'; e.style.setProperty('--dx', Math.cos(a) * d + 'px'); e.style.setProperty('--dy', Math.sin(a) * d + 'px'); app.appendChild(e); setTimeout(() => e.remove(), 600); } };
+  const take = o => {
+    clearTimeout(o.t); sigs.splice(sigs.indexOf(o), 1); count += o.rare ? 5 : 1; localStorage.setItem('zam-signs-count', count); showCount(); pop(); setTimeout(() => coin(o.rare), 60); ring(o.cx, o.cy, o.rare); spark(o.cx, o.cy, o.rare);
+    o.e.classList.add('got'); setTimeout(() => o.e.remove(), 320);
+    bubble((o.rare ? '⭐ ' : '') + (o.s.name || o.s.code), true);
+  };
+  const collect = () => { const cx = x + W / 2, cy = y + H / 2; for (const o of sigs.slice()) { const dx = o.cx - cx, dy = o.cy - cy; if ((dx / 36) ** 2 + (dy / 60) ** 2 < 1) take(o); } };
+  const spawn = () => {
+    if (!document.body.contains(car)) { clearInterval(spawnT); return; }
+    if (sigs.length >= 3 || !pool.length || document.hidden) return;
+    const s = pool[Math.floor(Math.random() * pool.length)], b = bounds(), rare = Math.random() < .05; let px, py, n = 0;
+    do { px = b.l + 8 + Math.random() * (b.r + W - b.l - SZ - 16); py = 70 + Math.random() * (window.innerHeight - SZ - 90); n++; } while (n < 12 && Math.hypot(px + SZ / 2 - (x + W / 2), py + SZ / 2 - (y + H / 2)) < 90);
+    const e = document.createElement('div'); e.className = 'fc-sign' + (rare ? ' rare' : ''); const cv = document.createElement('canvas'); cv.width = cv.height = 112; SG.drawSign(cv.getContext('2d'), s.code, 56, 56, 100); e.appendChild(cv);
+    e.style.left = px + 'px'; e.style.top = py + 'px'; app.appendChild(e);
+    const o = { e, s, rare, cx: px + SZ / 2, cy: py + SZ / 2 }; sigs.push(o);
+    o.t = setTimeout(() => { const i = sigs.indexOf(o); if (i >= 0) sigs.splice(i, 1); e.classList.add('out'); setTimeout(() => e.remove(), 650); }, rare ? 7000 : 9000);
+  };
+  setTimeout(spawn, 1100); spawnT = setInterval(spawn, 2000);
+  if (!localStorage.getItem('zam-car-hint')) { localStorage.setItem('zam-car-hint', 1); setTimeout(() => bubble('Намайг чир! 🚗'), 700); }
+}
+function catHtml(id) {
+  const k = CATS.find(x => x.id === id) || CATS[0], all = TEST_CHAPTERS.filter(c => c.cat === k.id), ready = all.filter(c => c.questions.length).length, cf = examCfg(k.id);
+  return `<div class="phone gl cr"><div class="top"><a class="back" href="#chapters" title="Нүүр">←</a><h1>${esc(k.name)}</h1><div class="cnt">${ready}/${k.of || ready}</div></div><div class="body" style="padding:6px 0 24px">
+    <div class="tiles" style="margin-bottom:10px"><a class="tile t0" href="#exam${k.id}"><span class="gi g-t"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13.5" r="7"/><path d="M12 13.5V9.5M9.5 3h5M12 3v3"/></svg></span><b>${k.label} ангилалын шалгалт</b><small>${cf.n} асуулт · ${cf.min} минут</small></a></div>
+    ${all.map(c => c.questions.length
+      ? `<a class="ch" style="--c:${CH_COLS[(c.no - 1) % CH_COLS.length]}" href="#${c.cat === 'B' ? 'c' : 'x'}${c.no}"><span class="no">${c.no}</span><span class="tx">${esc(c.name)}<small>${c.questions.length} асуулт</small></span><span class="go">›</span></a>`
+      : `<div class="ch soon"><span class="no">${c.no}</span><span class="tx">${esc(c.name)}<small>Удахгүй</small></span><span class="go">🔒</span></div>`).join('')}</div></div>`;
+}
+function catMenu(id) { app.innerHTML = catHtml(id); }
+/* Анх удаа ангиллын цэс рүү орох үеийн нэг удаагийн стиль/layout тооцоог нүүр хуудас нээгдсэний дараа сул үед (idle) урьдчилан хийнэ. */
+let _warmed = false;
+function warmCats() {
+  if (_warmed) return; _warmed = true;
+  const run = () => { try { const w = document.createElement('div'); w.setAttribute('aria-hidden', 'true'); w.style.cssText = 'position:fixed;left:-9999px;top:0;width:360px;visibility:hidden;pointer-events:none'; w.innerHTML = CATS.filter(c => catQ(c.id)).map(c => catHtml(c.id)).join(''); document.body.appendChild(w); void w.offsetHeight; w.remove(); } catch (e) {} };
+  (window.requestIdleCallback || (f => setTimeout(f, 500)))(run, { timeout: 2500 });
+}
+
+/* албан ёсны тэмдгийн SVG (225 файл, 5MB): үндсэн цэсийг блоклохгүй, зөвхөн тэмдэгтэй дэлгэцүүд хэрэгтэй үед хүлээнэ */
+let svgP = null, SVG_DONE = false;
+const loadSvgsOnce = () => svgP || (svgP = SG.loadSvgs().then(() => { SVG_DONE = true; }, () => { SVG_DONE = true; }));
+let _booted = false;
+const hideNativeSplash = (() => { let done = false; return () => { if (done) return; done = true; try { const S = window.Capacitor && Capacitor.Plugins && Capacitor.Plugins.SplashScreen; if (S && S.hide) S.hide({ fadeOutDuration: 200 }); } catch (e) {} }; })();
+const bootHide = () => requestAnimationFrame(() => requestAnimationFrame(hideNativeSplash));   // эхний бодит render-ийн дараах frame
+function route() {
+  if (!SVG_DONE && /^#(?:[cx]\d|exam|ask$|phist=)|review$/.test(location.hash)) { loadSvgsOnce().then(route); return; }
+  CrystalDialog.dismiss();
+  document.onkeydown = null; app.onclick = null; if (EX) clearInterval(EX.timer); window.scrollTo(0, 0);
+  const h = location.hash, m = /^#([cx])(\d+)/.exec(h);   // #cN = B ангилалын бүлэг, #xN = C, D, E ангилалын бүлэг
+  chap = TEST_CHAPTERS.find(c => c.no === (m ? +m[2] : 1) && (!m || (c.cat === 'B') === (m[1] === 'c'))) || TEST_CHAPTERS[0];
+  if (m && !chap.questions.length) { location.hash = '#cat' + (chap.cat || 'B'); return; }   // асуулт нь хараахан ороогүй бүлэг
+  const mc = /^#cat([A-Z])$/.exec(h), me = /^#exam([A-Z])?$/.exec(h);   // #exam (хуучин холбоос) = B ангилалын шалгалт
+  if ((mc && !catQ(mc[1])) || (me && !catQ(me[1] || 'B'))) { location.hash = '#chapters'; return; }   // асуулт ороогүй ангилал
+  (h === '#chapters' || h === '#tests' ? chapters : h === '#ask' ? askList : /^#progress$/.test(h) ? PROG.page : /^#phist=/.test(h) ? PROG.review : mc ? () => catMenu(mc[1]) : me ? () => exam(me[1] || 'B') : /review$/.test(h) ? review : practice)();
+  if (_booted) enterFx(); else _booted = true;   // анхны зураглалд fade хийхгүй: splash-тай нэг дор тасралтгүй шилжинэ
+  bootHide();
+}
+/* ---- Хөдөлгөөн (лавлах бичлэг шиг): (C) хуруунд зөөлөн шилэн дугуй, (A) хавтан өргөжин хуудас болно, (B) шинэ хуудасны хэсгүүд бүдэгээс тод болж дарааллаар гарна ---- */
+const REDUCE = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+let _from = null;
+const PRESS = 'a.tile, a.ch, .tile.soon, .ch.soon, .mg-btn';
+const blobs = new Map();
+document.addEventListener('pointerdown', e => {
+  const el = e.target.closest(PRESS); if (!el || REDUCE() || e.button) return;
+  const r = el.getBoundingClientRect(), d = Math.min(150, Math.max(90, Math.max(r.width, r.height) * .5)), b = document.createElement('span'); b.className = 'blob';
+  b.style.cssText = 'width:' + d + 'px;height:' + d + 'px;left:' + (e.clientX - r.left - d / 2) + 'px;top:' + (e.clientY - r.top - d / 2) + 'px';
+  el.appendChild(b); const grow = b.animate([{ transform: 'scale(.3)', opacity: 0 }, { transform: 'scale(1)', opacity: 1 }], { duration: 240, easing: 'cubic-bezier(.2,.8,.2,1)', fill: 'forwards' }); blobs.set(e.pointerId, { b, grow });
+});
+const releaseBlob = e => { const o = blobs.get(e.pointerId); if (!o) return; blobs.delete(e.pointerId);
+  o.b.animate([{ transform: 'scale(1)', opacity: 1 }, { transform: 'scale(2.2)', opacity: 0 }], { duration: 420, easing: 'ease-out', fill: 'forwards' }).onfinish = () => o.b.remove(); };
+document.addEventListener('pointerup', releaseBlob, true); document.addEventListener('pointercancel', releaseBlob, true);
+document.addEventListener('click', e => {
+  const el = e.target.closest(PRESS); if (!el || e.ctrlKey || e.metaKey || e.shiftKey || e.button) return;
+  if (el.classList.contains('soon')) { el.classList.remove('nope'); void el.offsetWidth; el.classList.add('nope'); return; }
+  if (el.tagName === 'A') {
+    const h = el.getAttribute('href'); e.preventDefault(); if (el.dataset.go) return; el.dataset.go = 1; el.classList.add('tap');
+    if (/.html/.test(h)) { try { sessionStorage.setItem('zam-from-' + h.replace(/\W.*/, ''), '1'); } catch (_) {} setTimeout(() => { location.href = h; }, 240); return; }
+    _from = REDUCE() ? null : el.getBoundingClientRect();   // шинэ хуудас энэ хавтангаас өргөжин гарна
+    setTimeout(() => { delete el.dataset.go; el.classList.remove('tap'); }, 300); location.hash = h;
+  } else { el.classList.remove('tap'); void el.offsetWidth; el.classList.add('tap'); setTimeout(() => el.classList.remove('tap'), 400); }
+});
+function enterFx() {
+  const from = _from; _from = null; if (REDUCE()) return;
+  const ph = app.querySelector('.phone'); if (!ph) return; let base = 0;
+  if (from) {
+    /* clip-path анимац нь кадр бүрд бүх хуудсыг дахин зурдаг (main thread) тул гацдаг байсан. Тэмдгийн төвөөс өргөжих үр дүнг transform+opacity (compositor)-оор үзүүлнэ. */
+    const p = ph.getBoundingClientRect();
+    ph.style.transformOrigin = Math.round(from.left + from.width / 2 - p.left) + 'px ' + Math.round(from.top + from.height / 2 - p.top) + 'px';
+    const an = ph.animate([{ transform: 'scale(.88)', opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 400, easing: 'cubic-bezier(.2,.8,.2,1)' });
+    an.onfinish = an.oncancel = () => { ph.style.transformOrigin = ''; };
+    base = 150;
+  } else ph.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 260, easing: 'ease-out' });
+  [...ph.querySelectorAll('.hero, .top, .tile, .ch, .ask, .score, .nx.wide, .pv2.wide, .mg-btn, .fc-colors')].slice(0, 8).forEach((el, i) => {
+    const blur = el.classList.contains('ch') || el.classList.contains('ask') || el.classList.contains('score');   // бүдэгээс тод: backdrop-filter-гүй хэсгүүдэд л
+    const a = { opacity: 0, transform: 'translateY(16px) scale(.98)' }, z = { opacity: 1, transform: 'none' }; 
+    el.animate([a, z], { duration: 380, delay: base + i * 35, easing: 'cubic-bezier(.2,.7,.2,1)', fill: 'backwards' });
+  });
+}
+NAV.init();
+window.addEventListener('hashchange', route);
+route();   // үндсэн цэс/ангиллын цэс SVG-г хүлээхгүй шууд зурагдана; тэмдэгтэй дэлгэцүүд route() дотор SVG-г хүлээнэ
+(window.requestIdleCallback || (f => setTimeout(f, 300)))(loadSvgsOnce, { timeout: 1500 });
+setTimeout(hideNativeSplash, 5000);   // найдвартай байдал: ямар нэг шалтгаанаар хаагдаагүй бол splash дээр үлдээхгүй
+window.addEventListener('error', () => setTimeout(hideNativeSplash, 1500));
+</script>
+</body>
+</html>
+
+

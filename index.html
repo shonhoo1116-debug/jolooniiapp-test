@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="mn">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#16202e">
+<title>Замын хөдөлгөөний дүрэм</title>
+<link rel="stylesheet" href="style.css">
+<script>if (location.hostname === 'localhost') location.replace('tests.html#chapters');   // Android апп: тоглоомгүй, шууд шалгалтын тест
+</script>
+</head>
+<body>
+
+<section id="home" class="screen on">
+  <div class="home-box">
+    <img class="school-logo" src="img/school-logo.jpg" alt="Завхан Отгон Жолоо авто жолооны сургууль">
+    <div class="logo">🚗💨</div>
+    <h1>Замын хөдөлгөөний дүрэм</h1>
+    <p class="tag">Жолоо мушгиж, дүрмээ тоглоомоор сур</p>
+    <button id="btnPlay" class="big">▶ Тоглох</button>
+    <p class="tag">Эхлэгчдэд: «Түвшин 1»-ээс эхэл, дараа нь «Тэмдэг цээжлэх»-ийг тоглоорой</p>
+    <div class="row">
+      <div id="homeStars" class="chip"></div>
+      <button id="btnSigns" class="ghost small">📖 Тэмдгийн толь</button>
+      <button id="btnTests" class="ghost small">📝 Сэдвийн тест</button>
+      <button id="btnSound" class="ghost small"></button>
+      <button id="btnMusic" class="ghost small"></button>
+    </div>
+    <p class="src">Дүрмийн эх сурвалж: «Монгол Улсын замын хөдөлгөөний дүрэм» (төсөл). Сургалтын зориулалттай; албан ёсны шалгалтыг орлохгүй.</p>
+  </div>
+</section>
+
+<section id="map" class="screen">
+  <header class="bar">
+    <button id="mapBack" class="ico">←</button>
+    <h2>Түвшнүүд</h2>
+    <div id="mapStars" class="chip"></div>
+  </header>
+  <div id="grid"></div>
+</section>
+
+<section id="game" class="screen">
+  <div id="stage"><canvas id="cv"></canvas></div>
+  <div id="segBanner"></div>
+  <div id="ctlbar" hidden><span id="ctlName">Товчийг чирж зөөнө</span><button id="ctlMinus">−</button><button id="ctlPlus">+</button><button id="ctlReset" class="ghost">Анхны</button><button id="ctlDone">✔ Болсон</button></div>
+  <div id="hud">
+    <button id="hBack" class="ico" aria-label="Буцах">←</button>
+    <div class="sp"></div>
+    <div id="hSpeed">0 км/ц</div>
+    <div id="hTime">0.0</div>
+    <button id="sigL" class="sig" aria-label="Зүүн залхаар дохио (Q)">⬅</button>
+    <button id="sigR" class="sig" aria-label="Баруун залхаар дохио (E)">➡</button>
+    <button id="hCruise" class="cruise" hidden>🔒 Хурд баригч</button>
+    <button id="hPause" class="ico" aria-label="Түр зогсоох">⏸</button>
+  </div>
+  <div id="ctrl">
+    <div class="pad left">
+      <div id="stick" aria-label="Жолоо (Thumbstick)"><div id="knob"></div></div>
+    </div>
+    <div class="pad right">
+      <button class="pedal brake" data-k="down" aria-label="Тоормос">▼</button>
+      <button class="pedal gas" data-k="up" aria-label="Хурдлах">▲</button>
+    </div>
+  </div>
+</section>
+
+<section id="quiz" class="screen">
+  <header class="bar">
+    <button id="qBack" class="ico">←</button>
+    <h2 id="qTitle"></h2>
+    <div id="qProg" class="chip"></div>
+  </header>
+  <div class="qbar"><div id="qBar"></div></div>
+  <div class="qwrap">
+    <div class="qcard">
+      <canvas id="qSign" width="200" height="200"></canvas>
+      <div id="qText" class="qtext"></div>
+      <div id="qOpts" class="opts"></div>
+      <div id="qFb" class="qfb"></div>
+      <button id="qNext" class="big" hidden>Дараах →</button>
+    </div>
+  </div>
+</section>
+
+<section id="learn" class="screen">
+  <header class="bar">
+    <button id="lBack" class="ico">←</button>
+    <h2 id="lTitle"></h2>
+    <div id="lChip" class="chip"></div>
+  </header>
+  <div id="lbody"></div>
+</section>
+
+<section id="builder" class="screen">
+  <header class="bar">
+    <button id="bBack" class="ico">←</button>
+    <h2 id="bTitle"></h2>
+  </header>
+  <div id="bHint" class="bhint"></div>
+  <div id="bWrap"><canvas id="bcv"></canvas></div>
+  <div id="bInfo" class="binfo"></div>
+  <div id="bPal"></div>
+  <div class="bbtns"><button id="bGo" class="big">▶ Явуул</button><button id="bClear" class="ghost">Цэвэрлэх</button></div>
+</section>
+
+<div id="dlg" hidden></div>
+
+<script src="js/signs-data.js"></script>
+<script src="js/signs-info.js"></script>
+<script src="signs-svg/index.js"></script>
+<script src="js/signs-draw.js"></script>
+<script src="js/signs-draw2.js"></script>
+<script src="js/audio-data.js"></script>
+<script src="js/audio.js"></script>
+<script src="js/engine.js"></script>
+<script src="js/builder.js"></script>
+<script src="js/learn-data.js"></script>
+<script src="js/learn.js"></script>
+<script src="js/levels.js"></script>
+<script src="js/levels-more.js"></script>
+<script src="js/quizzes.js"></script>
+<script src="js/ui.js"></script>
+</body>
+</html>

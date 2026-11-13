@@ -1,0 +1,510 @@
+<!doctype html>
+<html lang="mn">
+<head>
+<meta charset="utf-8">
+<script src="js/license.js"></script>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0e1830">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Отгон жолоо">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<script>if ('serviceWorker' in navigator && location.protocol === 'https:' && location.hostname !== 'localhost') window.addEventListener('load', function () { navigator.serviceWorker.register('sw.js').then(function () { return navigator.serviceWorker.ready; }).then(function (r) { if (r.active) r.active.postMessage('warm'); }).catch(function () {}); });</script>
+<script>
+(function () { var d = document.documentElement; try { d.setAttribute('data-theme', localStorage.getItem('zam-theme') === 'dark' ? 'dark' : 'light'); } catch (e) { d.setAttribute('data-theme', 'light'); } })();
+</script>
+<title>Тэмдгийн толь</title>
+<style>
+  :root { --bg:#16202e; --card:#1f2c40; --ink:#f4f1e8; --accent:#ffd23f; --mut:#9aa6ba; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink); font-family:system-ui,"Segoe UI",sans-serif; }
+  header { position:sticky; top:0; z-index:5; background:var(--bg); padding:12px 16px 8px; border-bottom:1px solid #2b3a52; }
+  h1 { margin:0 0 6px; font-size:20px; color:var(--accent); }
+  .meta { font-size:13px; color:var(--mut); margin-bottom:8px; }
+  .pills { display:flex; gap:6px; flex-wrap:wrap; }
+  .pills button { font:inherit; font-size:13px; font-weight:700; border:0; border-radius:999px; padding:6px 12px; background:#2b3a52; color:var(--ink); cursor:pointer; }
+  .pills button.on { background:var(--accent); color:#222; }
+  #grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:12px; padding:14px 16px 30px; }
+  .sign { background:var(--card); border-radius:12px; padding:12px 8px 10px; text-align:center; cursor:pointer; }
+  .sign canvas { width:104px; height:104px; background:#e9edf2; border-radius:10px; }
+  .sign.todo canvas { opacity:.35; }
+  .sign .code { margin-top:6px; font-weight:700; font-size:14px; color:var(--accent); }
+  .sign .name { font-size:12px; line-height:1.3; color:var(--mut); margin-top:2px; min-height:32px; }
+  .sign.todo .code::after { content:' · зураагүй'; color:#ff9a8a; font-weight:400; font-size:11px; }
+  .sign.approx .code::after { content:' · ойролцоо'; color:#ffb347; font-weight:400; font-size:11px; }
+  .sign.official .code::after { content:' ✔'; color:#4cd964; font-weight:400; font-size:12px; }
+  .tabs { display:flex; gap:8px; margin:0 0 8px; }
+  .tabs button { font:inherit; font-size:14px; font-weight:700; border:0; border-radius:10px; padding:7px 16px; background:#2b3a52; color:var(--ink); cursor:pointer; }
+  .tabs button.on { background:var(--ink); color:#16202e; }
+  .sign.mk canvas, .sign.mk img { width:100%; height:104px; object-fit:contain; }
+  .sign.mk.wait .ph { height:104px; border-radius:10px; background:#e9edf2; display:flex; align-items:center; justify-content:center; font-size:12px; color:#6b7686; padding:6px; }
+  .intro { grid-column:1/-1; background:#16202e; border:1px solid #2b3a52; border-radius:16px; padding:18px 18px 8px; margin-bottom:4px; }
+  .intro h2 { margin:0 0 12px; padding-bottom:12px; font-size:20px; border-bottom:1px solid #2b3a52; }
+  .intro .par { border:1px solid #2b3a52; border-radius:12px; background:#1b283b; padding:12px 16px; margin:0 0 12px; color:var(--mut); font-size:14px; line-height:1.7; }
+  .intro .par p { margin:0 0 8px; } .intro .par p:last-child { margin:0; }
+  .credits { margin:6px 16px 40px; font-size:12px; color:var(--mut); line-height:1.5; }
+  .credits summary { cursor:pointer; font-weight:700; color:var(--ink); }
+  .credits table { border-collapse:collapse; margin-top:8px; } .credits td { padding:2px 10px 2px 0; vertical-align:top; }
+  #big { position:fixed; inset:0; background:rgba(5,9,15,.8); display:none; align-items:center; justify-content:center; z-index:9; }
+  #big.on { display:flex; }
+  #big .box { background:var(--card); border-radius:16px; padding:18px; text-align:center; max-width:92vw; }
+  #big canvas { width:min(70vw,320px); height:min(70vw,320px); background:#e9edf2; border-radius:14px; }
+  #big .code { font-size:22px; font-weight:700; color:var(--accent); margin-top:10px; }
+  #big .name { margin-top:4px; max-width:340px; }
+  #big .box { max-height:92vh; overflow:auto; }
+  #big .info { text-align:left; max-width:420px; margin:12px auto 0; font-size:14px; line-height:1.5; }
+  #big .info h4 { margin:10px 0 2px; font-size:12px; letter-spacing:.04em; text-transform:uppercase; color:var(--accent); }
+  #big .info p { margin:0; color:var(--ink); }
+  #big .info .src { margin-top:10px; font-size:11px; color:var(--mut); }
+
+  /* ---- тестийн апптай нэг хэв маяг ---- */
+  body { background:radial-gradient(120% 50% at 50% -6%, #1d2f66 0%, #0b1330 55%, #070d22 100%) fixed; }
+  header { background:rgba(9,15,36,.92); backdrop-filter:blur(10px); border-bottom:1px solid rgba(255,255,255,.1); padding:calc(10px + env(safe-area-inset-top)) 14px 8px; }
+  h1 { display:flex; align-items:center; gap:10px; color:#fff; font-size:18px; }
+  h1 a { width:40px; height:40px; border-radius:12px; display:grid; place-items:center; background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.14); color:var(--accent) !important; margin-right:0 !important; font-size:20px; }
+  .tabs button { background:rgba(255,255,255,.08); border-radius:12px; } .tabs button.on { background:linear-gradient(135deg, #19b5a5, #2f7cf6); color:#fff; }
+  .pills { flex-wrap:nowrap; overflow-x:auto; padding-bottom:4px; scrollbar-width:none; } .pills::-webkit-scrollbar { display:none; } .pills button { flex:none; background:rgba(255,255,255,.08); }
+  .pills button.on { background:linear-gradient(135deg, #ffe566, #ffd23f); color:#1b1b1b; }
+  .meta { display:none; }
+  #grid { grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); gap:10px; padding:12px 12px 30px; }
+  .sign { background:linear-gradient(135deg, rgba(255,255,255,.09), rgba(255,255,255,.03)); border:1px solid rgba(255,255,255,.1); border-radius:16px; box-shadow:0 5px 14px rgba(0,0,0,.25); }
+  .sign canvas { width:100%; height:auto; aspect-ratio:1; border-radius:12px; }
+  .sign .code { color:#ffd23f; }
+  #big .box { background:linear-gradient(160deg, #1b2a5c, #101a3d); border:1px solid rgba(255,255,255,.14); border-radius:22px; }
+  .intro { background:rgba(255,255,255,.05); border-color:rgba(255,255,255,.1); } .intro .par { background:rgba(255,255,255,.04); border-color:rgba(255,255,255,.1); }
+
+  /* ---- «Liquid glass» загвар (тестийн апптай ижил). Мянга орчим карт байдаг тул карт бүрт backdrop-filter хэрэглэхгүй — зөвхөн толгой, цонхонд. Буцаах: signs.html.bak-glass ---- */
+  :root { --ink:#1a2547; --mut:#5a6a90; --accent:#3d5afe; }
+  body { color:var(--ink); background:radial-gradient(60% 30% at 10% 2%, #bcd3ff 0%, transparent 70%), radial-gradient(55% 28% at 95% 8%, #e2c9ff 0%, transparent 70%), radial-gradient(60% 35% at 85% 55%, #ffd9e8 0%, transparent 72%), radial-gradient(70% 40% at 6% 85%, #c4f0e4 0%, transparent 72%), linear-gradient(180deg, #e9effb, #dfe7f7) fixed; }
+  header { background:linear-gradient(145deg, rgba(255,255,255,.7), rgba(255,255,255,.4)); backdrop-filter:blur(22px) saturate(1.7); -webkit-backdrop-filter:blur(22px) saturate(1.7); border-bottom:1px solid rgba(255,255,255,.85); box-shadow:0 8px 26px rgba(60,80,150,.14), inset 0 -1px 0 rgba(255,255,255,.5); }
+  h1 { color:#1a2547; }
+  h1 a { background:linear-gradient(145deg, rgba(255,255,255,.8), rgba(255,255,255,.4)); border:1px solid rgba(255,255,255,.9); box-shadow:0 4px 12px rgba(60,80,150,.15), inset 0 1px 0 #fff; color:#3d5afe !important; }
+  .tabs button, .pills button { background:linear-gradient(145deg, rgba(255,255,255,.8), rgba(255,255,255,.45)); border:1px solid rgba(255,255,255,.9); color:#1a2547; box-shadow:0 3px 10px rgba(60,80,150,.12), inset 0 1px 0 #fff; }
+  .tabs button.on { background:linear-gradient(135deg, #5b7cff, #3d5afe); color:#fff; border-color:transparent; box-shadow:0 6px 16px rgba(61,90,254,.35); }
+  .pills button.on { background:linear-gradient(135deg, #ffe566, #ffc933); color:#1b1b1b; border-color:transparent; box-shadow:0 5px 14px rgba(255,190,40,.4); }
+  .sign { background:linear-gradient(145deg, rgba(255,255,255,.85), rgba(255,255,255,.55)); border:1px solid rgba(255,255,255,.95); box-shadow:0 6px 18px rgba(60,80,150,.14), inset 0 1px 0 #fff; border-radius:20px; }
+  .sign canvas { background:#f3f6fb; box-shadow:inset 0 0 0 1px rgba(60,80,150,.1); }
+  .sign .code { color:#3d5afe; } .sign .name { color:var(--mut); }
+  .sign.todo .code::after { color:#d9455a; } .sign.approx .code::after { color:#d98300; } .sign.official .code::after { color:#1f9d55; }
+  .intro { background:linear-gradient(145deg, rgba(255,255,255,.8), rgba(255,255,255,.5)); border:1px solid rgba(255,255,255,.95); box-shadow:0 6px 18px rgba(60,80,150,.12); color:var(--ink); }
+  .intro h2 { border-bottom-color:rgba(60,80,150,.18); color:#1a2547; } .intro .par { background:rgba(255,255,255,.55); border-color:rgba(60,80,150,.14); color:var(--mut); }
+  .credits { color:var(--mut); } .credits summary { color:#1a2547; }
+  #big { background:rgba(120,135,175,.45); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); }
+  #big .box { background:linear-gradient(145deg, rgba(255,255,255,.92), rgba(240,244,255,.8)); border:1px solid #fff; box-shadow:0 18px 50px rgba(40,60,130,.3), inset 0 1px 0 #fff; color:var(--ink); }
+  #big .code { color:#3d5afe; } #big .info p { color:var(--ink); } #big .info h4 { color:#3d5afe; } #big .info .src { color:var(--mut); }
+
+  /* ---- Цэвэрхэн үсгийн хэв (тестийн апптай нэг) ---- */
+  body, button { font-family:-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Inter", "Segoe UI Variable Display", "Segoe UI Variable Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; text-rendering:optimizeLegibility; }
+  h1 { font-size:17px; font-weight:600; letter-spacing:-.01em; }
+  .tabs button, .pills button { font-weight:600; letter-spacing:-.005em; } .pills button { font-size:13px; font-weight:500; } .pills button.on, .tabs button.on { font-weight:600; }
+  .sign .code { font-weight:600; font-size:14px; letter-spacing:-.005em; } .sign .name { font-weight:400; color:#6b7898; font-size:12px; line-height:1.35; }
+  .intro h2 { font-weight:600; letter-spacing:-.012em; } .intro .par { font-weight:400; }
+  #big .code { font-weight:600; font-size:22px; } #big .info h4 { font-weight:600; letter-spacing:.06em; } #big .info p { font-weight:400; }
+
+  /* ---- Тэмдгийн бүлгийн цэс (pills) + таб: тунгалаг шилэн хүрээ ---- */
+  .pills { gap:8px; padding:4px 2px 6px; }
+  .pills button, .tabs button { background:linear-gradient(145deg, rgba(255,255,255,.34), rgba(255,255,255,.1)); border:1px solid rgba(255,255,255,.8); backdrop-filter:blur(8px) saturate(1.5); -webkit-backdrop-filter:blur(8px) saturate(1.5); box-shadow:0 3px 10px rgba(60,80,150,.1), inset 0 1px 0 rgba(255,255,255,.85); color:#26335c; }
+  .pills button.on { background:linear-gradient(145deg, rgba(255,215,90,.6), rgba(255,215,90,.3)); border-color:rgba(255,255,255,.9); color:#3a2a00; box-shadow:0 5px 14px rgba(255,190,40,.3), inset 0 1px 0 rgba(255,255,255,.9); }
+  .tabs button.on { background:linear-gradient(145deg, rgba(91,124,255,.6), rgba(61,90,254,.4)); border-color:rgba(255,255,255,.85); color:#fff; box-shadow:0 6px 16px rgba(61,90,254,.28), inset 0 1px 0 rgba(255,255,255,.8); }
+
+  /* ---- Бүлгийн оршил + тэмдгийн картууд: тунгалаг шил. Карт бүрт backdrop-filter хэрэглэхгүй (олон карт гүйлгэхэд гацна) — зөвхөн хагас тунгалаг градиент + хүрээ ---- */
+  .intro { background:linear-gradient(145deg, rgba(255,255,255,.4), rgba(255,255,255,.12)); border:1px solid rgba(255,255,255,.8); backdrop-filter:blur(10px) saturate(1.5); -webkit-backdrop-filter:blur(10px) saturate(1.5); box-shadow:0 8px 22px rgba(60,80,150,.1), inset 0 1px 0 rgba(255,255,255,.85); }
+  .intro .par { background:linear-gradient(145deg, rgba(255,255,255,.28), rgba(255,255,255,.08)); border:1px solid rgba(255,255,255,.7); }
+  .intro h2 { border-bottom-color:rgba(255,255,255,.7); }
+  .sign { background:linear-gradient(145deg, rgba(255,255,255,.4), rgba(255,255,255,.1)); border:1px solid rgba(255,255,255,.8); box-shadow:0 4px 14px rgba(60,80,150,.09), inset 0 1px 0 rgba(255,255,255,.85); }
+  .sign canvas { background:rgba(255,255,255,.55); box-shadow:inset 0 0 0 1px rgba(255,255,255,.7); }
+
+  /* ---- Дэлгэрэнгүй цонх: тунгалаг шил (ард нь бүдгэрч харагдана, бичиг уншигдахуйц хэмжээнд цагаан) ---- */
+  #big { background:rgba(150,165,205,.28); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px); }
+  #big .box { background:linear-gradient(145deg, rgba(255,255,255,.52), rgba(255,255,255,.26)); border:1px solid rgba(255,255,255,.85); backdrop-filter:blur(26px) saturate(1.7); -webkit-backdrop-filter:blur(26px) saturate(1.7); box-shadow:0 20px 50px rgba(40,60,130,.22), inset 0 1px 0 rgba(255,255,255,.95); }
+  #big canvas { background:rgba(255,255,255,.55); box-shadow:inset 0 0 0 1px rgba(255,255,255,.8); }
+
+  /* ---- Дарах анимаци ---- */
+  .sign { position:relative; overflow:hidden; transition:transform .14s ease; -webkit-user-select:none; user-select:none; }
+  .sign:active { transform:scale(.95); }
+  .sblob { position:absolute; border-radius:50%; pointer-events:none; z-index:2; background:radial-gradient(circle, rgba(120,150,255,.34) 0, rgba(255,255,255,.55) 52%, rgba(255,255,255,.18) 72%, transparent 74%); border:1px solid rgba(255,255,255,.75); }
+  .sign.pop canvas, .sign.pop img { animation:spop .38s ease; } @keyframes spop { 0% { transform:scale(1); } 35% { transform:scale(1.14) rotate(-3deg); } 70% { transform:scale(.97) rotate(1.5deg); } 100% { transform:scale(1); } }
+  .pills button, .tabs button { transition:transform .12s; } .pills button:active, .tabs button:active { transform:scale(.93); }
+
+  /* ---- Гарчгийн шилэн дүрс (тестийн цэсний дүрстэй адил, ягаавтар-улаан) ---- */
+  .gi { position:relative; width:34px; height:34px; flex:none; border-radius:12px; display:grid; place-items:center; background:linear-gradient(145deg, #ffb3c1, rgba(255,93,124,.82)); border:1px solid rgba(255,255,255,.85);
+    box-shadow:inset 0 1.5px 0 rgba(255,255,255,.9), inset 0 -5px 8px rgba(255,93,124,.45), 0 6px 12px rgba(255,93,124,.34); }
+  .gi::before { content:''; position:absolute; left:5px; right:5px; top:2px; height:11px; border-radius:9px 9px 15px 15px; background:linear-gradient(180deg, rgba(255,255,255,.55), rgba(255,255,255,0)); pointer-events:none; }
+  .gi svg { width:19px; height:19px; position:relative; filter:drop-shadow(0 1px 2px rgba(30,40,100,.35)); }
+
+  /* ---- Гүйцэтгэл: бүдгэрүүлэлтийг авсан (мянга орчим карттай хуудас гацаж байсан) ---- */
+  header, .intro, .tabs button, .pills button, #big, #big .box { backdrop-filter:none !important; -webkit-backdrop-filter:none !important; }
+  header { background:rgba(236,241,252,.96); } #big { background:rgba(120,135,175,.5); } #big .box { background:rgba(255,255,255,.94); }
+  .sign { box-shadow:0 2px 8px rgba(60,80,150,.1); transition:none; } .sign canvas { box-shadow:none; }
+
+  /* ---- Гүйцэтгэл v2: fixed дэвсгэр, хүнд сүүдэр, градиент карт, давхар давхаргыг авсан ---- */
+  body { background:#e8edf9 !important; }
+  body::before { content:''; position:fixed; inset:0; z-index:-1; pointer-events:none; background:radial-gradient(60% 30% at 10% 2%, #bcd3ff 0%, transparent 70%), radial-gradient(55% 28% at 95% 8%, #e2c9ff 0%, transparent 70%), radial-gradient(60% 35% at 85% 55%, #ffd9e8 0%, transparent 72%), radial-gradient(70% 40% at 6% 85%, #c4f0e4 0%, transparent 72%), linear-gradient(180deg, #e9effb, #dfe7f7); transform:translateZ(0); }
+  header { box-shadow:none !important; border-bottom:1px solid rgba(255,255,255,.9) !important; transform:translateZ(0); }
+    .sign { background:rgba(255,255,255,.68) !important; box-shadow:none !important; border:1px solid rgba(255,255,255,.95) !important; }
+  .sign canvas { box-shadow:none !important; }
+  .intro { box-shadow:none !important; background:rgba(255,255,255,.62) !important; }
+  .pills button, .tabs button { box-shadow:none !important; }
+
+  /* ---- Томруулсан цонх: хөнгөн (хүнд сүүдэр, blur, том canvas-гүй) ---- */
+  #big .box { box-shadow:0 6px 18px rgba(40,60,130,.22) !important; will-change:transform, opacity; -webkit-overflow-scrolling:touch; overscroll-behavior:contain; }
+  #big { will-change:opacity; }
+
+  .ldg { grid-column:1/-1; display:flex; justify-content:center; gap:10px; padding:70px 0; } .ldg i { width:12px; height:12px; border-radius:50%; background:#5b7cff; animation:ldgb 1s ease-in-out infinite; } .ldg i:nth-child(2) { animation-delay:.15s; } .ldg i:nth-child(3) { animation-delay:.3s; }
+  @keyframes ldgb { 0%,80%,100% { transform:scale(.5); opacity:.4; } 40% { transform:scale(1); opacity:1; } }
+
+  /* ---- Тэмдгийн толь: Opaque Liquid Glass цонх ---- */
+  #big .box { background:radial-gradient(120% 70% at 8% 0%, #ffffff 0%, rgba(255,255,255,0) 55%), linear-gradient(180deg, rgba(255,255,255,.9) 0%, rgba(255,255,255,0) 16%), linear-gradient(160deg, #FFFFFF 0%, #EAF2FF 52%, #EEE7FF 100%) !important;
+    border:1px solid #fff !important; border-radius:26px !important; overflow-x:hidden; width:min(76vw,400px);
+    box-shadow:0 1px 2px rgba(40,60,130,.10), 0 8px 18px rgba(40,60,130,.12), 0 22px 44px rgba(88,102,190,.16), inset 0 1px 0 #fff !important; }
+  #big canvas { background:#EDF0F5 !important; box-shadow:none !important; }
+  #big .code { color:#172344 !important; } #big .name { color:#172344; font-weight:600; } #big .info p { color:#172344 !important; } #big .info h4 { color:#3d4fb5 !important; }
+  #big .info .src { color:#526587 !important; }
+  #big .box { position:relative; touch-action:pan-y; }
+
+  /* ===== Шөнийн горим (data-theme="dark"): Dark Crystal Glass. Өдрийн горимын CSS хэвээр. ===== */
+  html[data-theme="dark"] { color-scheme:dark; --ink:#F1F5FF; --mut:#B8C5E0; --accent:#83A8F8; }
+  html[data-theme="dark"] body { background:#0B1020 !important; color:#F1F5FF; }
+  html[data-theme="dark"] body::before { background:radial-gradient(60% 30% at 10% 2%, rgba(90,120,230,.26) 0%, transparent 70%), radial-gradient(55% 28% at 95% 8%, rgba(150,110,240,.20) 0%, transparent 70%), radial-gradient(60% 35% at 85% 55%, rgba(230,110,170,.09) 0%, transparent 72%), linear-gradient(180deg, #0B1020, #141D33); }
+  html[data-theme="dark"] header { background:linear-gradient(180deg, #172036, #121A2D) !important; border-bottom:1px solid rgba(190,210,255,.14) !important; box-shadow:0 4px 14px rgba(0,0,0,.35) !important; }
+  html[data-theme="dark"] h1, html[data-theme="dark"] h1 a { color:#F1F5FF; }
+  html[data-theme="dark"] .tabs button, html[data-theme="dark"] .pills button { background:linear-gradient(150deg, rgba(48,64,102,.95), rgba(32,44,74,.95)); border:1px solid rgba(190,210,255,.22); color:#F1F5FF; box-shadow:0 2px 8px rgba(0,0,0,.3), inset 0 1px 0 rgba(190,210,255,.18); }
+  html[data-theme="dark"] .tabs button.on { background:linear-gradient(145deg, rgba(110,140,255,.85), rgba(70,100,240,.7)); color:#fff; border-color:rgba(190,210,255,.5); }
+  html[data-theme="dark"] .pills button.on { background:linear-gradient(145deg, #ffe566, #ffc933); color:#1b1b1b; border-color:transparent; }
+  html[data-theme="dark"] .sign { background:linear-gradient(180deg, rgba(190,210,255,.10) 0%, rgba(190,210,255,0) 46%), linear-gradient(150deg, rgba(40,54,88,.88), rgba(30,42,72,.82)) !important; border:1px solid rgba(190,210,255,.22) !important; box-shadow:0 2px 10px rgba(0,0,0,.32), inset 0 1px 0 rgba(190,210,255,.2) !important; }
+  html[data-theme="dark"] .sign .code { color:#83A8F8; } html[data-theme="dark"] .sign .name { color:#B8C5E0; }
+  html[data-theme="dark"] .intro { background:linear-gradient(150deg, rgba(40,54,88,.88), rgba(30,42,72,.82)) !important; border:1px solid rgba(190,210,255,.22) !important; color:#F1F5FF; box-shadow:0 4px 14px rgba(0,0,0,.3) !important; }
+  html[data-theme="dark"] .intro h2 { color:#F1F5FF; border-bottom-color:rgba(190,210,255,.18); }
+  html[data-theme="dark"] .intro .par { background:rgba(20,29,51,.7); border-color:rgba(190,210,255,.16); color:#D5DFF5; }
+  html[data-theme="dark"] .credits, html[data-theme="dark"] .credits summary, html[data-theme="dark"] .meta { color:#B8C5E0; }
+  html[data-theme="dark"] .ldg i { background:#83A8F8; }
+  /* томруулсан цонх: бараан болор хүрээ, тэмдгийн зураг тод, тайлбар цайвар */
+  html[data-theme="dark"] #big { background:rgba(4,8,20,.62); }
+  html[data-theme="dark"] #big .box { background:radial-gradient(120% 70% at 8% 0%, rgba(190,210,255,.14) 0%, rgba(190,210,255,0) 55%), linear-gradient(180deg, rgba(190,210,255,.12) 0%, rgba(190,210,255,0) 16%), linear-gradient(160deg, #1E2A47 0%, #17213B 55%, #1B1D3F 100%) !important;
+    border:1px solid rgba(190,210,255,.26) !important; box-shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 22px rgba(0,0,0,.4), 0 24px 48px rgba(0,0,0,.3), inset 0 1px 0 rgba(190,210,255,.26) !important; color:#F1F5FF; }
+  html[data-theme="dark"] #big canvas { background:#EDF0F5 !important; }
+  html[data-theme="dark"] #big .code { color:#F1F5FF !important; } html[data-theme="dark"] #big .name { color:#E3EAFB; }
+  html[data-theme="dark"] #big .info p { color:#E3EAFB !important; } html[data-theme="dark"] #big .info h4 { color:#83A8F8 !important; } html[data-theme="dark"] #big .info .src { color:#B8C5E0 !important; }
+
+  /* ---- Coverflow: карт бүр өөрийн glass-тайгаа хөдөлнө ---- */
+  #big .box { will-change:transform, opacity; }
+  #big .box.cfg { position:fixed; margin:0; z-index:1; max-width:none; }
+  #big.dragging { user-select:none; -webkit-user-select:none; cursor:grabbing; }
+  /* Томруулсан цонх нээлттэй үед арын жагсаалт (мянган канвас, карт) дэлгэцэнд харагдахгүй ч compositing давхаргын мод руу орсоор байдаг → кадр бүрийн Layerize ачаалал. Нууснаар ~80% буурна. */
+  html.cfo body > :not(#big):not(.cfind):not(script) { visibility:hidden; }
+  .cfind { display:none; position:fixed; left:50%; bottom:calc(14px + env(safe-area-inset-bottom)); transform:translateX(-50%); z-index:10; align-items:center; gap:10px; padding:5px 14px; border-radius:99px;
+    background:linear-gradient(180deg, #fff, #EAF0FF); border:1px solid #fff; color:#172344; font-size:13px; font-weight:600; box-shadow:0 1px 2px rgba(40,60,130,.12), 0 6px 14px rgba(40,60,130,.16); }
+  #big.on ~ .cfind { display:flex; }
+  .cfa { display:none; width:26px; height:26px; padding:0; border:0; border-radius:50%; background:rgba(61,90,254,.12); color:#3d4fb5; font-size:18px; line-height:24px; cursor:pointer; }
+  @media (hover:hover) and (pointer:fine) { .cfa { display:block; } }
+  html[data-theme="dark"] .cfind { background:linear-gradient(180deg, #2A3860, #1E2A47); border-color:rgba(190,210,255,.28); color:#F1F5FF; box-shadow:0 6px 14px rgba(0,0,0,.4); }
+  html[data-theme="dark"] .cfa { background:rgba(131,168,248,.2); color:#BFD3FF; }
+  #big { background:linear-gradient(160deg, rgba(200,216,250,.97), rgba(230,216,250,.97)); }
+  html[data-theme="dark"] #big { background:linear-gradient(160deg, rgba(8,13,30,.97), rgba(16,12,36,.97)); }
+  #big { padding-bottom:64px; box-sizing:border-box; }
+  #big .box { max-height:calc(100vh - 100px) !important; max-height:calc(100dvh - 100px) !important; }
+</style>
+</head>
+<body>
+<header>
+  <h1><a href="tests.html#chapters" id="homeLink" style="text-decoration:none" title="Нүүр хуудас">←</a><span class="gi"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8.6 3.5h6.8L20.5 8.6v6.8l-5.1 5.1H8.6l-5.1-5.1V8.6z"/><path d="M8 12h8"/></svg></span>Тэмдгийн толь</h1>
+  <div class="tabs" id="tabs"><button data-m="signs" class="on">Тэмдэг</button><button data-m="marks">Тэмдэглэл</button></div>
+  <div class="meta" id="meta"></div>
+  <div class="pills" id="pills"></div>
+</header>
+<div id="grid"></div>
+<div id="big"><div class="box"><div class="bin"><canvas id="bigc" width="512" height="512"></canvas><div class="code" id="bcode"></div><div class="name" id="bname"></div><div class="info" id="binfo"></div></div></div></div><div class="cfind" id="cfind"><button class="cfa" data-d="-1" type="button" aria-label="Өмнөх">‹</button><span id="cfn"></span><button class="cfa" data-d="1" type="button" aria-label="Дараах">›</button></div>
+
+<script src="js/signs-data.js"></script>
+<script src="js/signs-info.js"></script>
+<script src="signs-svg/index.js"></script>
+<script src="js/signs-draw.js"></script>
+<script src="js/signs-draw2.js"></script>
+<script src="js/markings.js"></script>
+<script>
+(() => {
+  let group = 0, mode = 'signs';
+  const grid = document.getElementById('grid'), pills = document.getElementById('pills'), meta = document.getElementById('meta');
+  const big = document.getElementById('big'), bigc = document.getElementById('bigc');
+  /* Тэмдэг бүрийн canvas-ийг НЭГ удаа зурж кэшлэнэ (кэш дэх canvas-ийг DOM-д зөөж ашиглана). Гүйлгэх, бүлэг солиход дахин зурахгүй → гацахгүй. Харагдах хэсгийг шууд, бусдыг ажиллаагүй цагт (idle) бага багаар зурна. */
+  let cache = new Map(), gen = 0; const bigCv = new Map(); let cardsC = null;
+  const getCv = code => { let cv = cache.get(code); if (!cv) { cv = document.createElement('canvas'); cv.width = cv.height = 160; cv.dataset.done = ''; cv.dataset.code = code; cache.set(code, cv); } return cv; };
+  const bigCanvasFor = code => {   // 512px зургийг кэшлэнэ (swipe бүрт вектор дахин зурахгүй)
+    let bc = bigCv.get(code); if (bc) { bigCv.delete(code); bigCv.set(code, bc); return bc; }
+    bc = document.createElement('canvas'); bc.width = bc.height = 512; const b = bc.getContext('2d'); b.fillStyle = '#e9edf2'; b.fillRect(0, 0, 512, 512); SG.drawSign(b, code, 256, 256, 448);
+    if (bigCv.size >= 14) bigCv.delete(bigCv.keys().next().value); bigCv.set(code, bc); return bc;
+  };
+  const paint = cv => { if (cv.dataset.done) return; cv.dataset.done = '1'; const code = cv.dataset.code, c = cv.getContext('2d'), W = 160;
+    c.fillStyle = '#e9edf2'; c.fillRect(0, 0, W, W); if (!SG.drawSign(c, code, W / 2, W / 2, W * .865)) { c.fillStyle = '#9aa6ba'; c.font = 'bold 40px system-ui'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText('?', W / 2, W / 2); } };
+  const idle = window.requestIdleCallback || (f => setTimeout(() => f({ timeRemaining: () => 8 }), 60));
+  let warmQ = [], warming = false;
+  const warm = () => { if (warming) return; warming = true; const step = d => { let n = 0; while (warmQ.length && n < 3 && d.timeRemaining() > 4) { paint(warmQ.shift()); n++; } if (warmQ.length) idle(step); else warming = false; }; idle(step); };
+  const prewarm = () => { warmQ = SIGNS.map(x => getCv(x.code)).filter(cv => !cv.dataset.done); warm(); };
+  let ready = false;   // албан ёсны SVG ачаалагдтал хүлээнэ (өмнө нь «ойролцоо» зураг хальт харагдаад солигддог байсан)
+  function render() {
+    cardsC = null; if (mode === 'marks') return renderMarks();
+    if (!ready) { grid.innerHTML = '<div class="ldg"><i></i><i></i><i></i></div>'; meta.textContent = ''; return; }
+    grid.textContent = '';
+    if (group && typeof SIGN_GROUP_INFO !== 'undefined') addIntro(group + '. ' + SIGN_GROUPS[group] + ' тэмдэг', [[group + '.1. ' + SIGN_GROUP_INFO[group].replace(/.$/, ':')]]);
+    const list = SIGNS.filter(s => !group || s.group === group);
+    const drawn = SIGNS.filter(s => SG.has(s.code)).length, official = SIGNS.filter(s => SG.isOfficial(s.code)).length;
+    meta.textContent = `Нийт ${SIGNS.length} тэмдэг · стандарт зураг ✔ ${official} · ойролцоо (кодоор зурсан) ${drawn - official} · харагдаж буй ${list.length}`;
+    for (const s of list) {
+      const d = document.createElement('div'); d.className = 'sign' + (!SG.has(s.code) ? ' todo' : SG.isOfficial(s.code) ? ' official' : ' approx');
+      const cv = getCv(s.code); d.appendChild(cv);
+      d.insertAdjacentHTML('beforeend', `<div class="code">${s.code}</div><div class="name">${s.name}</div>`);
+      d.onclick = () => {
+        bigc.getContext('2d').drawImage(bigCanvasFor(s.code), 0, 0);
+        document.getElementById('bcode').textContent = s.code; document.getElementById('bname').textContent = '«' + s.name + '»';
+        showInfo(s);
+        big.classList.add('on');
+      };
+      grid.appendChild(d);
+    }
+    paintVisible();
+  }
+  // бүлгийн оршил (эгчийн сайтын «ямар учиртай вэ» хэсэг шиг)
+  function addIntro(title, pars) {
+    const d = document.createElement('div'); d.className = 'intro';
+    d.innerHTML = '<h2>' + esc(title) + '</h2><div class="par">' + pars.map(p => '<p>' + esc(p[0]) + '</p>').join('') + '</div>';
+    grid.appendChild(d);
+  }
+  // ---- Тэмдэглэл (хэвтээ, босоо) ----
+  const MK_EXT = ['svg', 'png', 'jpg'], MK_TR = { 'а': 'a', 'б': 'b', 'в': 'v' };
+  const mkFile = code => [...code].map(c => MK_TR[c] || c).join('');
+  const paintVisible = () => { const cvs = [...grid.querySelectorAll('.sign canvas')].filter(c => !c.dataset.done); cvs.slice(0, 24).forEach(paint); warmQ = cvs.slice(24); warming = false; if (warmQ.length) warm(); };
+  function renderMarks() { cardsC = null;
+    grid.innerHTML = '';
+    if (group && typeof MARKING_INTRO !== 'undefined') addIntro(group + '. ' + MARKING_GROUPS[group], MARKING_INTRO[group].map(t => [t]));
+    const list = MARKINGS.filter(m => !group || m.group === group);
+    meta.textContent = 'Нийт ' + MARKINGS.length + ' тэмдэглэл · зураг нь ирэх тусам стандарт болгон солигдоно · харагдаж буй ' + list.length;
+    for (const m of list) {
+      const d = document.createElement('div'); d.className = 'sign mk';
+      const holder = document.createElement('div'); d.appendChild(holder);
+      const cv = document.createElement('canvas'); cv.width = 208; cv.height = 208; const c = cv.getContext('2d');
+      if (drawMarking(c, m.code, 208, 208)) holder.appendChild(cv); else { d.classList.add('wait'); holder.innerHTML = '<div class="ph">Стандарт зураг хүлээгдэж байна</div>'; }
+      attachFileImage(m, holder, d);
+      d.insertAdjacentHTML('beforeend', '<div class="code">' + m.code + '</div><div class="name">' + esc(m.name) + '</div>');
+      d.onclick = () => openMark(m, holder);
+      grid.appendChild(d);
+    }
+  }
+  // markings/<код>.svg|png|jpg файл байвал кодоор зурсныг нь солино
+  function attachFileImage(m, holder, card) {
+    let k = 0; const im = new Image();
+    const next = () => { if (k >= MK_EXT.length) return; im.src = 'markings/' + mkFile(m.code) + '.' + MK_EXT[k++]; };
+    im.onload = () => { holder.innerHTML = ''; card.classList.remove('wait'); card.classList.add('official'); holder.appendChild(im); };
+    im.onerror = next; next();
+  }
+  function openMark(m, holder) {
+    const g = bigc.getContext('2d'); g.fillStyle = '#e9edf2'; g.fillRect(0, 0, 512, 512);
+    const el = holder.querySelector('img'); 
+    if (el) { const r = Math.min(448 / el.naturalWidth, 448 / el.naturalHeight); g.drawImage(el, 256 - el.naturalWidth * r / 2, 256 - el.naturalHeight * r / 2, el.naturalWidth * r, el.naturalHeight * r); }
+    else if (!drawMarking(g, m.code, 512, 512)) { g.fillStyle = '#6b7686'; g.font = 'bold 30px system-ui'; g.textAlign = 'center'; g.fillText('Стандарт зураг хүлээгдэж байна', 320, 330); }
+    document.getElementById('bcode').textContent = m.code; document.getElementById('bname').textContent = '«' + m.name + '»';
+    document.getElementById('binfo').innerHTML = '<h4>Утга, үүрэг</h4><p>' + esc(m.d) + '</p><h4>' + esc(MARKING_GROUPS[m.group]) + ' юуг заадаг вэ</h4><p>' + esc(MARKING_GROUP_INFO[m.group]) + '</p><div class="src">Эх сурвалж: Замын хөдөлгөөний дүрмийн 2-р хавсралт (2018 оны төсөл)</div>';
+    big.classList.add('on');
+  }
+  const esc = t => t.replace(/&/g, '&amp;').replace(/</g, '&lt;');
+  const cap = t => t.charAt(0).toUpperCase() + t.slice(1) + (/[.!?]$/.test(t) ? '' : '.');
+  function showInfo(s) { document.getElementById('binfo').innerHTML = infoHtml(s); }
+  function infoHtml(s) {
+    const i = (typeof SIGN_INFO !== 'undefined' && SIGN_INFO[s.code]) || {}, g = (typeof SIGN_GROUP_INFO !== 'undefined' && SIGN_GROUP_INFO[s.group]) || '';
+    let h = '';
+    if (i.d) h += '<h4>Утга, үүрэг</h4><p>' + esc(cap(i.d)) + '</p>';
+    if (g) h += '<h4>' + esc(SIGN_GROUPS[s.group]) + ' тэмдэг юуг заадаг вэ' + '</h4><p>' + esc(g) + '</p>';
+    if (i.r) h += '<h4>Байрлуулах, үйлчлэх журам</h4><p>' + esc(cap(i.r)) + '</p>';
+    if (h) h += '<div class="src">Эх сурвалж: Замын хөдөлгөөний дүрмийн 1-р хавсралт (2018 оны төсөл)</div>';
+    return h;
+  }
+  big.onclick = e => { if (e.target.closest('.info')) return; big.classList.remove('on'); };
+  const mk = (g, label) => { const b = document.createElement('button'); b.textContent = label; b.onclick = () => { group = g; [...pills.children].forEach(x => x.classList.toggle('on', x === b)); render(); }; if (g === 0) b.classList.add('on'); pills.appendChild(b); };
+  const buildPills = () => { pills.innerHTML = ''; group = 0; mk(0, 'Бүгд'); const gs = mode === 'marks' ? MARKING_GROUPS : SIGN_GROUPS; for (const g of Object.keys(gs)) mk(+g, g + '. ' + gs[g] + (mode === 'marks' ? '' : ' тэмдэг')); };
+  buildPills();
+  document.querySelectorAll('#tabs button').forEach(b => b.onclick = () => { mode = b.dataset.m; document.querySelectorAll('#tabs button').forEach(x => x.classList.toggle('on', x === b)); buildPills(); render(); });
+  render();
+  const om = decodeURIComponent(location.hash).match(/#open=([\d.а-я]+)/);   // жишээ: signs.html#open=2.4
+  if (location.hash.includes('marks')) document.querySelector('#tabs button[data-m=marks]').click();   // signs.html#marks
+  const m = location.hash.match(/#g(\d)/); if (m) pills.children[+m[1]].click();
+  const svgsDone = () => { if (ready) return; ready = true; cache = new Map(); bigCv.clear(); render(); prewarm(); };
+  setTimeout(svgsDone, 5000);   // SVG удаан бол 5 сек хүлээгээд байгаагаар нь харуулна
+  SG.loadSvgs().then(() => { svgsDone(); if (om) [...grid.children].find(d => d.querySelector('.code').textContent === om[1])?.click(); });   // албан ёсны SVG ачаалагдмагц дахин зурна
+  // ---- Хажуу тийш шудрахад бүлэг солигдоно: зүүн тийш → дараагийн бүлэг, баруун тийш → өмнөх. Сүүлийн бүлгээс цааш «Тэмдэг ↔ Тэмдэглэл» руу шилжинэ ----
+  const goIdx = i => { const kids = [...pills.children]; if (i < 0 || i >= kids.length) return false; kids[i].click(); kids[i].scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'smooth' }); return true; };
+  let sx = 0, sy = 0, sw = false, st = 0;
+  document.addEventListener('touchstart', e => { const t = e.touches[0]; sw = e.touches.length === 1 && !big.classList.contains('on') && !e.target.closest('#pills, #tabs, .credits'); sx = t.clientX; sy = t.clientY; st = Date.now(); }, { passive: true });
+  document.addEventListener('touchend', e => {
+    if (!sw) return; sw = false; const t = e.changedTouches[0], dx = t.clientX - sx, dy = t.clientY - sy;
+    if (Math.abs(dx) < 70 || Math.abs(dx) < Math.abs(dy) * 1.6 || Date.now() - st > 700) return;
+    const kids = [...pills.children], cur = Math.max(0, kids.findIndex(b => b.classList.contains('on'))), dir = dx < 0 ? 1 : -1;
+    const slide = el => { if (!el.animate || matchMedia('(prefers-reduced-motion: reduce)').matches) return; el.animate([{ transform: 'translateX(' + (dir * 36) + 'px)', opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 260, easing: 'cubic-bezier(.2,.8,.2,1)' }); };
+    if (!goIdx(cur + dir)) { const other = document.querySelector('#tabs button:not(.on)'); if (mode === 'signs' && dir > 0 || mode === 'marks' && dir < 0) { other.click(); if (dir < 0) goIdx(pills.children.length - 1); } else return; }
+    window.scrollTo({ top: 0 }); if (grid.animate && !matchMedia('(prefers-reduced-motion: reduce)').matches) grid.animate([{ opacity: .35 }, { opacity: 1 }], { duration: 160 });
+  }, { passive: true });
+  // ---- Нээлттэй цонхон дээр хажуу тийш шудрахад дараагийн/өмнөх тэмдэг (эсвэл тэмдэглэл) рүү шилжинэ ----
+  // ---- Premium 3D Coverflow Carousel: карт бүр өөрийн шилэн (glass) дэвсгэр, хүрээ, сүүдэр, зураг, текстийн хамт НЭГ БҮХЭЛ хөдөлнө ----
+  // Голын карт = жинхэнэ .box. Хажуугийн карт (.cfg) = хөрш тэмдгийн бүтэн карт (дэвсгэр+агуулга хамт) хуулбар. Бүгд нэг u (-1..1) хувьсагчаар transform/opacity-оор хөдөлнө.
+  let noClose = 0, cfBusy = false, cfRaf = 0, cfU = 0, cfW = 0, cfStep = 0, cfObs = 0;
+  const GAP = 8, side = { '-1': null, '1': null };
+  const boxEl = () => big.querySelector('.box:not(.cfg)');
+  const cardsAll = () => cardsC || (cardsC = [...grid.querySelectorAll('.sign')]);   // жагсаалт солигдох үед л дахин цуглуулна
+  const neighbour = dir => { const c = cardsAll(); return c[c.indexOf(openCard) + dir]; };
+  const renderOnly = nx => { swipeNav = true; nx.click(); swipeNav = false; };                    // хуудсыг гүйлгэхгүйгээр тэмдгийг голын хайрцагт зурна
+  const swapTo = nx => { renderOnly(nx); boxEl().scrollTop = 0; };   // арын жагсаалтыг энд гүйлгэхгүй: хаах үед л
+  const clearSides = () => { ['-1', '1'].forEach(k => { if (side[k]) side[k].remove(); side[k] = null; }); };
+  const apply = (el, p) => {
+    if (!el) return; const a = Math.min(1, Math.abs(p));
+    if (p === 0) { el.style.transform = ''; el.style.opacity = ''; return; }
+    el.style.transform = 'translate3d(' + (p * cfStep).toFixed(1) + 'px,0,0) scale(' + (1 - .10 * a).toFixed(4) + ')'; el.style.opacity = (1 - .45 * a).toFixed(3);
+  };
+  let cfPend = null, cfPR = 0;
+  const cfQueue = u => { cfPend = u; if (!cfPR) cfPR = requestAnimationFrame(() => { cfPR = 0; if (cfPend !== null) { cfPaint(cfPend); cfPend = null; } }); };   // pointermove-ийг кадр бүрт нэг л удаа зурна
+  const cfFlush = () => { cancelAnimationFrame(cfPR); cfPR = 0; cfPend = null; };
+  const cfPaint = u => { cfU = u; apply(boxEl(), u); apply(side['-1'], -1 + u); apply(side['1'], 1 + u); };
+  const indicator = () => {
+    const c = cardsAll(), i = c.indexOf(openCard), n = document.getElementById('cfn'); if (n && i >= 0) n.textContent = (i + 1) + ' / ' + c.length;
+  };
+  // Хайрцгийн (glass дэвсгэр, хүрээ, сүүдэр, зураг, текст бүхий) бүтэн хуулбар; r = голын хайрцгийн төвд байх үеийн байрлал (viewport px)
+  // fill(g) өгвөл хуулбарын агуулгыг шууд бөглөнө (голын хайрцагт хүрэхгүй → layout дахин тооцоолохгүй); same = хуучин хайрцгийн яг байрлал
+  const mkGhost = (src, r, fill, same) => {
+    const g = src.cloneNode(true);
+    if (fill) fill(g); else { const a = src.querySelectorAll('canvas'), b = g.querySelectorAll('canvas'); a.forEach((c, i) => { b[i].getContext('2d').drawImage(c, 0, 0); }); }
+    g.querySelectorAll('[id]').forEach(x => x.removeAttribute('id')); g.removeAttribute('id'); g.classList.add('cfg');
+    g.style.cssText = 'left:' + r.left + 'px;width:' + r.width + 'px;top:' + r.top + 'px;opacity:0';
+    big.appendChild(g);
+    if (!same) { const h = Math.min(g.offsetHeight, innerHeight - 100); g.style.top = (r.top + (r.height - h) / 2) + 'px'; }
+    return g;
+  };
+  const signOf = card => { if (!card || card.classList.contains('mk')) return null; const c = card.querySelector('.code'); return c && SIGNS.find(x => x.code === c.textContent); };
+  const fillSign = s => g => {
+    g.querySelector('canvas').getContext('2d').drawImage(bigCanvasFor(s.code), 0, 0);
+    g.querySelector('.code').textContent = s.code; g.querySelector('.name').textContent = '«' + s.name + '»'; g.querySelector('.info').innerHTML = infoHtml(s);
+  };
+  const centerRect = box => ({ left: box.offsetLeft, top: box.offsetTop, width: box.offsetWidth, height: box.offsetHeight });   // #big = fixed inset:0 → viewport координат; transform нөлөөлөхгүй
+  const buildSide = (dir, fade) => {
+    if (side[dir]) return; const nx = neighbour(dir); if (!nx) return;
+    const box = boxEl(), cur = openCard, top = box.scrollTop, r = centerRect(box);
+    const s = signOf(nx); let g;
+    if (s) g = mkGhost(box, r, fillSign(s));   // тэмдэг: голын хайрцгийг шалгахгүйгээр шууд бөглөнө
+    else { renderOnly(nx); g = mkGhost(boxEl(), r); renderOnly(cur); box.scrollTop = top; }   // тэмдэглэл: хуучин арга
+    side[dir] = g;
+    if (fade) { g.style.transition = 'opacity .22s ease'; setTimeout(() => { g.style.transition = ''; }, 260); }
+    apply(g, dir + cfU);
+  };
+  const buildSides = (fade) => {
+    clearSides(); const r = boxEl().getBoundingClientRect(); cfW = r.width; cfStep = cfW + GAP;
+    buildSide(-1, fade); buildSide(1, fade); indicator(); cfPaint(0);
+  };
+  let cfLate = 0;   // swipe-ийн дараа алслагдсан хөрш картыг дараагийн кадрт (идэвхгүй үед) бэлдэнэ
+  const buildLate = () => { cancelAnimationFrame(cfLate); cfLate = requestAnimationFrame(() => { cfLate = 0; if (!big.classList.contains('on') || cfBusy || gs) return; buildSide(-1, true); buildSide(1, true); indicator(); }); };
+  // spring (критик дарамттай): u = target + (A + B t) e^(-wt); хурууны хурдтай үргэлжилнэ
+  const settle = (u0, target, v0, done) => {
+    cfBusy = true; cancelAnimationFrame(cfRaf); const A = u0 - target, w = 17, B = v0 + w * A, t0 = performance.now();
+    const step = now => {
+      const t = (now - t0) / 1000, e = Math.exp(-w * t), u = target + (A + B * t) * e, vel = (B - w * (A + B * t)) * e;
+      if (t > .5 || (Math.abs(u - target) < .003 && Math.abs(vel) < .06)) { cfPaint(target); cfBusy = false; done && done(); return; }
+      cfPaint(u); cfRaf = requestAnimationFrame(step);
+    };
+    cfRaf = requestAnimationFrame(step);
+  };
+  const finalize = dir => {
+    const nx = neighbour(dir); if (!nx) { cfPaint(0); return; }
+    // Хуучин голын хайрцгийг шууд хажуугийн хуулбар болгож хадгална (дахин зурахгүй), дараагийн хөрш л шинээр бэлдэгдэнэ
+    const old = mkGhost(boxEl(), centerRect(boxEl()), null, true);
+    swapTo(nx); clearSides(); side[-dir] = old;
+    cfPaint(0); indicator(); noClose = Date.now() + 400;
+    buildLate();
+  };
+  const navTo = dir => {
+    if (!openCard || !big.classList.contains('on') || cfBusy) return;
+    if (!neighbour(dir)) { settle(-dir * .06, 0, 0); return; }
+    if (RM()) { swapTo(neighbour(dir)); buildSides(false); return; }
+    if (!side[dir]) buildSides(false);
+    settle(0, -dir, 0, () => finalize(dir));
+  };
+  // тэмдэг дарахад (хажуугийн карт) голд шилжинэ
+  big.addEventListener('click', e => { const g = e.target.closest('.cfg'); if (!g) return; e.stopImmediatePropagation(); e.preventDefault(); if (Date.now() < noClose) return; navTo(side['-1'] === g ? -1 : 1); }, true);
+  document.addEventListener('keydown', e => { if (!big.classList.contains('on')) return; if (e.key === 'ArrowRight') navTo(1); else if (e.key === 'ArrowLeft') navTo(-1); });
+  document.addEventListener('click', e => { const b = e.target.closest('.cfa'); if (b) navTo(b.dataset.d | 0); });
+  // хуруугаар/хулганаар чирэх: босоо гүйлгэлтийг салгаж, хэвтээ хөдөлгөөнийг л дагана
+  let gs = null;
+  big.addEventListener('pointerdown', e => {
+    if (cfBusy || !e.isPrimary || e.target.closest('.cfind') || !e.target.closest('.box')) return;
+    gs = { id: e.pointerId, x: e.clientX, y: e.clientY, t: performance.now(), mode: 0, dx: 0, lt: performance.now(), lx: e.clientX, v: 0 };
+  });
+  big.addEventListener('pointermove', e => {
+    if (!gs || e.pointerId !== gs.id) return; const dx = e.clientX - gs.x, dy = e.clientY - gs.y;
+    if (gs.mode === 0) {
+      if (Math.abs(dx) < 8 && Math.abs(dy) < 8) return;
+      if (Math.abs(dx) > Math.abs(dy) * 1.3 && openCard) { gs.mode = 1; try { big.setPointerCapture(e.pointerId); } catch (_) {} big.classList.add('dragging'); const r = boxEl().getBoundingClientRect(); cfW = r.width; cfStep = cfW + GAP; if (!RM()) { cancelAnimationFrame(cfLate); cfLate = 0; const d0 = dx < 0 ? 1 : -1; buildSide(d0, false); buildSide(-d0, false); indicator(); apply(side['-1'], -1 + cfU); apply(side['1'], 1 + cfU); } }
+      else { gs.mode = 2; return; }
+    }
+    if (gs.mode !== 1) return; gs.dx = dx; const now = performance.now(); if (now - gs.lt > 16) { gs.v = (e.clientX - gs.lx) / cfStep / ((now - gs.lt) / 1000); gs.lt = now; gs.lx = e.clientX; }
+    if (RM()) return;
+    let u = Math.max(-1, Math.min(1, dx / cfStep)); const dir = u < 0 ? 1 : -1; if (!neighbour(dir)) u *= .25;   // захын тэмдэг дээр бага зэрэг эсэргүүцэнэ
+    gs.u = u; cfQueue(u);
+  });
+  const endDrag = e => {
+    if (!gs || e.pointerId !== gs.id) return; const m = gs; gs = null; if (m.mode !== 1) return; big.classList.remove('dragging'); noClose = Date.now() + 450;
+    cfFlush(); const dir = m.dx < 0 ? 1 : -1, has = !!neighbour(dir), uu = (m.u === undefined ? cfU : m.u), vv = Math.max(-3, Math.min(3, m.v));
+    if (RM()) { if (has && Math.abs(m.dx) > 60) { swapTo(neighbour(dir)); buildSides(false); } return; }
+    const fast = Math.abs(m.v) > 1.6 && Math.abs(m.dx) > 36 && Math.sign(m.v) === Math.sign(m.dx), commit = has && (Math.abs(uu) > .22 || fast);
+    if (commit) settle(uu, -dir, vv, () => finalize(dir)); else settle(uu, 0, 0);
+  };
+  big.addEventListener('pointerup', endDrag); big.addEventListener('pointercancel', endDrag);
+  // цонх нээгдэх/хаагдахад хажуугийн картыг үүсгэж/арилгана
+  cfObs = new MutationObserver(() => {
+    if (big.classList.contains('on')) { clearTimeout(cfObs.t); cfObs.t = setTimeout(() => { if (big.classList.contains('on')) { document.documentElement.classList.add('cfo'); if (!side['-1'] && !side['1']) buildSides(true); else indicator(); } }, 380); }
+    else { clearTimeout(cfObs.t); document.documentElement.classList.remove('cfo'); clearSides(); cfFlush(); cancelAnimationFrame(cfRaf); cfBusy = false; const b = boxEl(); if (b) { b.style.transform = ''; b.style.opacity = ''; } }
+  });
+  cfObs.observe(big, { attributes: true, attributeFilter: ['class'] });
+  // зохиогчийн мэдээлэл (Wikimedia Commons)
+  if (typeof SIGN_SVG_CREDITS !== 'undefined') {
+    const det = document.createElement('details'); det.className = 'credits';
+    det.innerHTML = '<summary>Тэмдгийн зургийн эх сурвалж, зохиогч, лиценз</summary><p>Стандарт (✔) тэмдгийн вектор зургуудыг Wikimedia Commons-оос авсан (Монгол Улсын Засгийн газар болон хэрэглэгчид). Лиценз: Public domain, CC0, CC BY-SA 4.0.</p><table>' +
+      SIGN_SVG_CREDITS.map(c => `<tr><td>${c.code}</td><td>${c.license}</td><td>${c.author}</td><td><a href="${c.source}" style="color:inherit">эх сурвалж</a></td></tr>`).join('') + '</table>';
+    document.body.appendChild(det);
+  }
+
+  // ---- Дарах анимаци: хуруунд зөөлөн шилэн дугуй, тэмдэг үсэрнэ, цонх тэмдэг дээрээсээ өргөжин нээгдэнэ, хаахад буцаж багасна ----
+  const RM = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const live = new Map(); let lastRect = null;
+  document.addEventListener('pointerdown', e => {
+    const c = e.target.closest('.sign'); if (!c || RM() || e.button) return;
+    const r = c.getBoundingClientRect(), d = Math.max(70, r.width * .8), b = document.createElement('span'); b.className = 'sblob';
+    b.style.cssText = 'width:' + d + 'px;height:' + d + 'px;left:' + (e.clientX - r.left - d / 2) + 'px;top:' + (e.clientY - r.top - d / 2) + 'px'; c.appendChild(b);
+    b.animate([{ transform: 'scale(.3)', opacity: 0 }, { transform: 'scale(1)', opacity: 1 }], { duration: 220, easing: 'cubic-bezier(.2,.8,.2,1)', fill: 'forwards' }); live.set(e.pointerId, b);
+  });
+  const rel = e => { const b = live.get(e.pointerId); if (!b) return; live.delete(e.pointerId); b.animate([{ transform: 'scale(1)', opacity: 1 }, { transform: 'scale(2.2)', opacity: 0 }], { duration: 400, easing: 'ease-out', fill: 'forwards' }).onfinish = () => b.remove(); };
+  document.addEventListener('pointerup', rel, true); document.addEventListener('pointercancel', rel, true);
+  let openCard = null, swipeNav = false;
+  grid.addEventListener('click', e => {
+    const c = e.target.closest('.sign'); if (c) { openCard = c; if (!swipeNav) lastRect = c.getBoundingClientRect(); } if (!c || RM() || swipeNav) return;   // swipe үед хүчээр layout уншихгүй, нээх анимаци хийхгүй
+    const box = big.querySelector('.box'), br = box.getBoundingClientRect();
+    if (br.width) { const dx = lastRect.left + lastRect.width / 2 - (br.left + br.width / 2), dy = lastRect.top + lastRect.height / 2 - (br.top + br.height / 2), sc = Math.max(.2, lastRect.width / br.width);
+      box.animate([{ transform: 'translate(' + dx + 'px,' + dy + 'px) scale(' + sc + ')', opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 280, easing: 'cubic-bezier(.22,.8,.2,1)' });
+      big.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 300, easing: 'ease-out' }); }
+  });
+  const closeBig = big.onclick;
+  big.onclick = e => {
+    if (e.target.closest('.info') || Date.now() < noClose) return;
+    clearSides(); document.documentElement.classList.remove('cfo');
+    if (openCard) { openCard.scrollIntoView({ block: 'nearest' }); lastRect = openCard.getBoundingClientRect(); }   // жагсаалтыг одоогийн тэмдэг дээр хаахад л гүйлгэнэ
+    if (RM() || !lastRect) { big.classList.remove('on'); return; }
+    const box = big.querySelector('.box'), br = box.getBoundingClientRect(), dx = lastRect.left + lastRect.width / 2 - (br.left + br.width / 2), dy = lastRect.top + lastRect.height / 2 - (br.top + br.height / 2), sc = Math.max(.2, lastRect.width / br.width);
+    const a = box.animate([{ transform: 'none', opacity: 1 }, { transform: 'translate(' + dx + 'px,' + dy + 'px) scale(' + sc + ')', opacity: 0 }], { duration: 300, easing: 'cubic-bezier(.5,0,.8,.4)' });
+    big.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 300, easing: 'ease-in' }); a.onfinish = () => big.classList.remove('on');
+  };
+})();
+</script>
+<script>
+/* ← : tests.html-ээс орж ирсэн бол history-г нэг алхам буцаана (түүхэнд шинэ оруулга нэмэхгүй) → нүүр дээр Back дарахад signs.html дахин нээгдэхгүй. */
+document.getElementById('homeLink').addEventListener('click', function (e) {
+  var from = null; try { from = sessionStorage.getItem('zam-from-signs'); } catch (_) {}
+  if (from === '1') { e.preventDefault(); try { sessionStorage.removeItem('zam-from-signs'); } catch (_) {} history.back(); }
+});
+</script>
+</body>
+</html>
