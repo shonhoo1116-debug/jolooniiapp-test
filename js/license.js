@@ -39,7 +39,10 @@
     bad_input: 'Кодоо бүтнээр нь оруулна уу.',
     net: 'Интернэт холболтоо шалгана уу. Идэвхжүүлэхэд нэг удаа интернэт хэрэгтэй.',
     nokey: 'Агуулгыг нээхэд нэг удаа интернэт хэрэгтэй. Холбогдоод апп-аа дахин нээнэ үү.',
+    expired: 'Таны 60 хоногийн эрх дууссан. Шинэ код аваад оруулна уу.',
+    stale: 'Удаан хугацаанд интернэтгүй байсан тул нэг удаа интернэтэд холбогдож баталгаажуулна уу.',
   };
+  const MAXOFF = 21 * 86400e3;     // 21 хоногоос удаан сервертэй холбогдоогүй бол нэг удаа онлайнаар баталгаажуулна
 
   let gate = null;
   const css = '#zl{position:fixed;inset:0;z-index:2147483647;display:flex;align-items:center;justify-content:center;padding:20px;box-sizing:border-box;overflow:auto;overscroll-behavior:contain;' +
@@ -84,7 +87,7 @@
         go.disabled = true; go.textContent = 'Шалгаж байна…'; m.textContent = '';
         rpc('activate_license', { p_code: code, p_device: devId() }).then(r => {
           if (r && r.ok) {
-            lic = { code, t: Date.now() }; put(LS, JSON.stringify(lic));
+            lic = { code, t: Date.now(), exp: r.exp || 0, seen: Math.max(Date.now(), r.now || 0) }; put(LS, JSON.stringify(lic));
             const done = () => { gate.remove(); gate = null; if (web) location.reload(); };   // вэб: шифртэй скриптүүд тайлагдан ачаалагдахын тулд дахин ачаална
             if (web && r.key) putKey(r.key, r.kid).then(done); else done();
           }
@@ -96,19 +99,34 @@
     if (document.documentElement) mount(); else document.addEventListener('DOMContentLoaded', mount);
   };
 
-  const recheck = force => {
-    if (!lic || !lic.code || (force !== true && Date.now() - (lic.t || 0) < RECHECK)) return;
+  /* ---- 60 хоногийн хугацаа: сервер идэвхжүүлэх үед exp (мс) өгнө. Цагийг хойш эргүүлсэн ч «сүүлд харсан цаг»-аас буурахгүй. ---- */
+  const saveLic = () => put(LS, JSON.stringify(lic));
+  const effNow = () => Math.max(Date.now(), (lic && lic.seen) || 0);
+  const localExpired = () => !!(lic && lic.exp && effNow() > lic.exp);
+  const expire = () => { del(LS); lic = null; if (web) delKey(); show(MSG.expired); };
+  const touch = () => { if (!lic) return; const n = effNow(); if (n !== lic.seen) { lic.seen = n; saveLic(); } };
+
+  const recheck = (force, failMsg) => {
+    if (!lic || !lic.code) return;
+    if (force !== true && Date.now() - (lic.t || 0) < RECHECK) return;
     rpc('check_license', { p_code: lic.code, p_device: devId() }).then(r => {
       if (r && r.ok) {
-        lic.t = Date.now(); put(LS, JSON.stringify(lic));
+        lic.t = Date.now(); if (r.exp) lic.exp = r.exp; lic.seen = Math.max(effNow(), r.now || 0); saveLic();
+        if (localExpired()) { expire(); return; }
         if (web && r.key) hasKey().then(had => putKey(r.key, r.kid).then(() => { if (!had) location.reload(); }));   // түлхүүр шинээр ирсэн бол дахин ачаална
-      } else if (r && (r.err === 'revoked' || r.err === 'not_found' || r.err === 'other_device')) { del(LS); lic = null; if (web) delKey(); show(MSG[r.err]); }
-    }).catch(() => { if (force === true) show(MSG.nokey); });   // сүлжээгүй бол одоогийн байдлаар үргэлжлүүлнэ (түлхүүртэй бол)
+      } else if (r && r.err === 'expired') { expire(); }
+      else if (r && (r.err === 'revoked' || r.err === 'not_found' || r.err === 'other_device')) { del(LS); lic = null; if (web) delKey(); show(MSG[r.err]); }
+    }).catch(() => { if (force === true) show(failMsg || MSG.nokey); });   // сүлжээгүй бол одоогийн байдлаар үргэлжлүүлнэ
   };
 
   window.ZamLicense = { active: () => !!(lic && lic.code), reset: () => { del(LS); lic = null; if (web) delKey(); show(); } };
   if (lic && lic.code) {
-    addEventListener('load', () => setTimeout(recheck, 1500)); addEventListener('online', () => recheck());
-    if (web) hasKey().then(h => { if (!h) recheck(true); });    // код идэвхжсэн боловч түлхүүр байхгүй (хуучин суулгалт) → серверээс түлхүүр аваад дахин ачаална
+    if (localExpired()) expire();
+    else {
+      touch();
+      addEventListener('load', () => setTimeout(recheck, 1500)); addEventListener('online', () => recheck());
+      if (Date.now() - (lic.t || 0) > MAXOFF || !lic.exp) recheck(true, MSG.stale);   // удаан онлайн болоогүй / хугацаа (exp) нь мэдэгдэхгүй хуучин суулгалт → серверээс баталгаажуулна
+      else if (web) hasKey().then(h => { if (!h) recheck(true); });    // код идэвхжсэн боловч түлхүүр байхгүй → серверээс түлхүүр аваад дахин ачаална
+    }
   } else show();
 })();
